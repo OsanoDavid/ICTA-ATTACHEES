@@ -1,0 +1,202 @@
+/* ===== SIDEBAR PUSH SYSTEM ===== */
+body {
+    transition: margin-right 0.45s ease;
+}
+
+body.acc-sidebar-open {
+    margin-right: 320px;
+}
+
+/* Floating trigger button — fixed, always visible */
+#accessibility-widget {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 99999;
+}
+
+#accessibility-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff9800 0%, #ed6c02 100%);
+    color: white;
+    border: 2px solid rgba(255,255,255,0.8);
+    box-shadow: 0 6px 20px rgba(237, 108, 2, 0.4);
+    cursor: pointer;
+    font-size: 22px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: acc-pulse 2.5s infinite;
+}
+
+#accessibility-btn:hover {
+    transform: scale(1.1);
+    animation: none;
+    box-shadow: 0 8px 25px rgba(237, 108, 2, 0.6);
+}
+
+@keyframes acc-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.5); }
+    70%  { box-shadow: 0 0 0 14px rgba(255, 152, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0); }
+}
+
+/* ===== THE SIDEBAR ITSELF ===== */
+#accessibility-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 320px;
+    height: 100vh;
+    transform: translateX(100%);
+    background: #ffffff;
+    border-left: 3px solid #f0f0f0;
+    box-shadow: -8px 0 40px rgba(0, 0, 0, 0.12);
+    z-index: 99998;
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 28px 22px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+#accessibility-panel.active {
+    transform: translateX(0);
+}
+
+.acc-title {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #0d6efd;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.acc-section {
+    margin-bottom: 20px;
+}
+
+.acc-label {
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.acc-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.acc-option {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.acc-option:hover, .acc-option.active {
+    background: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+
+/* Voice Assistant Pulsing Overlay */
+#voice-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(13, 110, 253, 0.9);
+    z-index: 10005;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    backdrop-filter: blur(5px);
+}
+
+.voice-wave {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: white;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2.5); opacity: 0; }
+}
+
+/* High Visibility Themes */
+.theme-red {
+    background-color: #d32f2f !important;
+    color: white !important;
+}
+.theme-red * { 
+    color: white !important;
+    border-color: rgba(255,255,255,0.3) !important;
+}
+.theme-red .btn-primary { background-color: #ffffff !important; color: #d32f2f !important; border: none !important; }
+
+.theme-yellow {
+    background-color: #fdd835 !important;
+    color: #000000 !important;
+}
+.theme-yellow * {
+    color: #000000 !important;
+    border-color: rgba(0,0,0,0.2) !important;
+}
+.theme-yellow .btn { border: 2px solid black !important; font-weight: 800 !important; }
+
+.theme-blue {
+    background-color: #1565c0 !important;
+    color: white !important;
+}
+.theme-blue * { color: white !important; }
+
+/* Visual Display Modes */
+.display-dark {
+    filter: invert(1) hue-rotate(180deg) !important;
+}
+.display-dark img,
+.display-dark video,
+.display-dark [class*="logo"] {
+    filter: invert(1) hue-rotate(180deg) !important;
+}
+
+.display-contrast {
+    filter: contrast(2) brightness(1.1) !important;
+}
+
+.display-grayscale {
+    filter: grayscale(1) !important;
+}
+
+.display-sepia {
+    filter: sepia(0.8) brightness(1.05) !important;
+}
+
+/* Active button style for toggled visual modes */
+.acc-option.mode-active {
+    background: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}

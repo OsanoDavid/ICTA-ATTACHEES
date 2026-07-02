@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ICTA Portal - Final Reports Archive</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        .x-small { font-size: 0.75rem; }
+        .hover-shadow:hover { box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'supervisor_dashboard' %}">
+                <img src="/static/images/logo1.png" alt="Logo" class="bg-white rounded p-1" style="max-height: 35px; object-fit: contain;">
+                <span class="fw-bold tracking-wide text-uppercase small">ICTA Supervisor Desk</span>
+            </a>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{% url 'supervisor_dashboard' %}" class="btn btn-sm btn-outline-light px-3 fw-bold">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h3 class="fw-bold text-dark mb-1">Final Reports Submission Archive</h3>
+                <p class="text-muted small mb-0">Evaluate and sign off on industrial attachment final reports submitted for clearance.</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            {% for assessment in assessments %}
+            <div class="col-md-6 col-xl-4">
+                <div class="card h-100 shadow-sm border-0 rounded-3 hover-shadow transition-all">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h6 class="fw-bold text-dark mb-0 uppercase tracking-tight">{{ assessment.attachee.full_name }}</h6>
+                                <span class="text-muted x-small">{{ assessment.attachee.registration_number }}</span>
+                            </div>
+                            {% if assessment.report_status == 'APPROVED' %}
+                                <span class="badge bg-success">Approved</span>
+                            {% elif assessment.report_status == 'PENDING' %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{ assessment.report_status }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="bg-light p-3 rounded-2 border mb-3">
+                            <div class="small fw-bold text-secondary mb-1">Uploaded On:</div>
+                            <div class="small text-dark">{{ assessment.report_uploaded_at|date:"M d, Y H:i"|default:"N/A" }}</div>
+                        </div>
+
+                        <div class="d-flex flex-column gap-2">
+                            {% if assessment.report_file %}
+                                <a href="{{ assessment.report_file.url }}" target="_blank" class="btn btn-dark w-100 fw-bold small py-2">
+                                    <i class="bi bi-file-earmark-pdf me-1"></i> View PDF Report
+                                </a>
+                            {% endif %}
+                            <a href="{% url 'evaluate_final_submission' assessment.id %}" class="btn btn-primary w-100 fw-bold small py-2">
+                                <i class="bi bi-pencil-square me-1"></i> Evaluate & Grade
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="text-center py-5 bg-white rounded-3 shadow-sm border border-dashed">
+                    <i class="bi bi-cloud-slash text-muted display-4 d-block mb-2"></i>
+                    <h5 class="text-secondary fw-bold">No Reports Submitted Yet</h5>
+                    <p class="text-muted small mb-0">Once attachées upload their final PDF reports, they will appear here for review.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <footer class="text-center py-4 mt-5 text-muted small border-top bg-white">
+        &copy; 2026 Information Communication Technology Authority (ICTA).
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,667 @@
+/* ============================================================
+   ICTA ADMIN PORTAL — CUSTOM STYLES
+   Scoped visibility + Jazzmin compatibility
+   ============================================================ */
+
+/* ============================================================
+   1. TABLE TEXT VISIBILITY — scoped, not global
+   ============================================================ */
+#result_list tbody td,
+#result_list tbody td a,
+.results td,
+.results th {
+    color: #1a1a2e !important;
+    font-size: 14px;
+    font-weight: 500;
+    vertical-align: middle !important;
+    padding: 10px 12px !important;
+}
+
+#result_list thead th,
+#result_list thead th a,
+#result_list thead th a:visited {
+    background: linear-gradient(135deg, #1a1a2e, #16213e) !important;
+    color: #7ecef4 !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.8px !important;
+    padding: 12px 14px !important;
+    border-bottom: 2px solid #0f3460 !important;
+}
+
+/* Zebra rows */
+#result_list tbody tr:nth-child(odd) { background-color: #f8f9ff !important; }
+#result_list tbody tr:nth-child(even) { background-color: #ffffff !important; }
+#result_list tbody tr:hover { background-color: #e8f4fd !important; }
+
+/* ============================================================
+   2. BREADCRUMBS & PAGE TITLES — scoped
+   ============================================================ */
+#content h1,
+#content h2,
+.content-title,
+#content-main h1,
+#content-main h2 {
+    color: #1a1a2e !important;
+    font-weight: 800 !important;
+}
+
+.breadcrumbs,
+.breadcrumbs a,
+.breadcrumbs > * {
+    color: #374151 !important;
+}
+
+/* ============================================================
+   3. FORM LABELS & INPUTS — scoped to admin content area
+   ============================================================ */
+#content-main label,
+.change-form label,
+.form-row label,
+.aligned label,
+div.form-row > div > label {
+    color: #1a1a2e !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+}
+
+#content-main p,
+.help,
+.help-block,
+p.help {
+    color: #374151 !important;
+}
+
+#content-main input[type="text"],
+#content-main input[type="email"],
+#content-main input[type="password"],
+#content-main input[type="number"],
+#content-main input[type="date"],
+#content-main select,
+#content-main textarea {
+    border: 2px solid #d1d5db !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    color: #111827 !important;
+    background: #ffffff !important;
+    font-size: 14px !important;
+}
+
+#content-main input:focus,
+#content-main select:focus,
+#content-main textarea:focus {
+    border-color: #2980b9 !important;
+    box-shadow: 0 0 0 3px rgba(41,128,185,0.15) !important;
+    outline: none !important;
+}
+
+/* Fieldset headers */
+fieldset.module h2,
+fieldset h2 {
+    background: linear-gradient(135deg, #1a1a2e, #16213e) !important;
+    color: #7ecef4 !important;
+    font-weight: 700 !important;
+    padding: 10px 15px !important;
+    border-radius: 6px !important;
+    font-size: 13px !important;
+    letter-spacing: 0.8px !important;
+    text-transform: uppercase !important;
+}
+
+/* ============================================================
+   4. FILTER SIDEBAR — scoped
+   ============================================================ */
+#changelist-filter h2 {
+    background: linear-gradient(135deg, #1a1a2e, #0f3460) !important;
+    color: #7ecef4 !important;
+    padding: 10px 15px !important;
+    font-size: 12px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.8px !important;
+}
+
+#changelist-filter h3 {
+    color: #1a1a2e !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+    text-transform: uppercase !important;
+}
+
+#changelist-filter a {
+    color: #374151 !important;
+}
+
+#changelist-filter li.selected a {
+    color: #2980b9 !important;
+    font-weight: 700 !important;
+}
+
+#changelist-filter ul li {
+    color: #374151 !important;
+}
+
+/* ============================================================
+   5. SEARCH & TOOLBAR
+   ============================================================ */
+#toolbar,
+#searchbar,
+#changelist-search input {
+    color: #111827 !important;
+    border: 2px solid #d1d5db !important;
+    border-radius: 8px !important;
+    background: #fff !important;
+}
+
+/* ============================================================
+   6. OBJECT TOOLS (Add button)
+   ============================================================ */
+.object-tools a {
+    background: linear-gradient(135deg, #15803d, #22c55e) !important;
+    color: #fff !important;
+    border-radius: 6px !important;
+    font-weight: 700 !important;
+    font-size: 11px !important;
+    padding: 8px 16px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 3px 8px rgba(34,197,94,0.3) !important;
+}
+.object-tools a:hover {
+    background: linear-gradient(135deg, #166534, #16a34a) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* ============================================================
+   7. CANCEL BUTTON
+   ============================================================ */
+.change-form .btn-secondary,
+.change-form a.btn-secondary {
+    background: linear-gradient(135deg, #92400e, #f59e0b) !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    border-radius: 6px !important;
+    padding: 8px 20px !important;
+}
+.change-form .btn-secondary:hover {
+    background: linear-gradient(135deg, #78350f, #d97706) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* ============================================================
+   8. MESSAGES / ALERTS
+   ============================================================ */
+.messagelist .success {
+    background: #dcfce7 !important;
+    color: #166534 !important;
+    border-left: 4px solid #22c55e !important;
+    font-weight: 600 !important;
+}
+.messagelist .warning {
+    background: #fef3c7 !important;
+    color: #92400e !important;
+    border-left: 4px solid #f59e0b !important;
+    font-weight: 600 !important;
+}
+.messagelist .error {
+    background: #fee2e2 !important;
+    color: #991b1b !important;
+    border-left: 4px solid #dc2626 !important;
+    font-weight: 600 !important;
+}
+
+/* ============================================================
+   9. BADGE SYSTEM — all inline-styled, always visible
+   ============================================================ */
+.badge {
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-weight: 700 !important;
+    border-radius: 6px !important;
+    padding: 5px 12px !important;
+    display: inline-block !important;
+    line-height: 1.4 !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+    font-size: 11px !important;
+}
+
+.badge:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important;
+}
+
+/* Bootstrap badge class overrides */
+.badge-danger  { background: linear-gradient(135deg,#7f1d1d,#dc2626) !important; color:#fff !important; }
+.badge-primary { background: linear-gradient(135deg,#1e3a6b,#2563eb) !important; color:#fff !important; }
+.badge-info    { background: linear-gradient(135deg,#0f4c4c,#0d9488) !important; color:#fff !important; }
+.badge-success { background: linear-gradient(135deg,#14532d,#22c55e) !important; color:#fff !important; }
+.badge-warning { background: linear-gradient(135deg,#92400e,#f59e0b) !important; color:#fff !important; }
+.badge-secondary { background: linear-gradient(135deg,#374151,#6b7280) !important; color:#fff !important; }
+.badge-warning.text-dark { color: #fff !important; }
+
+/* Custom bg helpers */
+.bg-indigo { background: linear-gradient(135deg,#4c1d95,#7c3aed) !important; color:#fff !important; }
+.bg-teal    { background: linear-gradient(135deg,#134e4a,#14b8a6) !important; color:#fff !important; }
+.bg-orange  { background: linear-gradient(135deg,#78350f,#f97316) !important; color:#fff !important; }
+.bg-maroon  { background: linear-gradient(135deg,#881337,#f43f5e) !important; color:#fff !important; }
+.bg-purple  { background: linear-gradient(135deg,#4a044e,#a21caf) !important; color:#fff !important; }
+
+/* ============================================================
+   10. PAGINATION
+   ============================================================ */
+.paginator {
+    color: #1a1a2e !important;
+    font-weight: 600 !important;
+}
+
+.paginator a {
+    color: #2980b9 !important;
+}
+
+/* ============================================================
+   11. SIDEBAR KEEPS JAZZMIN STYLES — do NOT override
+   DO NOT put broad body/p/li/span rules here.
+   Jazzmin handles sidebar colouring natively.
+   ============================================================ */
+
+/* Only fix: ensure brand / nav-link text is white in sidebar */
+.main-sidebar .brand-link .brand-text,
+.main-sidebar .nav-link p,
+.main-sidebar .nav-treeview .nav-link p {
+    color: #fff !important;
+}
+
+/* ============================================================
+   12. COLUMN ALIGNMENT
+   ============================================================ */
+.admin-list-table .column-get_status_badge,
+.admin-list-table .column-get_role_badge,
+.admin-list-table .column-is_active_badge,
+.admin-list-table .column-get_category_label,
+.admin-list-table .column-deadline_badge,
+.admin-list-table .column-get_work_mode_badge,
+.admin-list-table .column-verification_badge,
+.admin-list-table .column-get_report_status_badge {
+    text-align: center;
+}
+
+/* ============================================================
+   13. STATUS-NAMED CLASSES (for any legacy markup)
+   ============================================================ */
+.timeline-overdue  { background:linear-gradient(135deg,#7f1d1d,#dc2626) !important; color:#fff !important; }
+.timeline-upcoming { background:linear-gradient(135deg,#155e75,#06b6d4) !important; color:#fff !important; }
+.mode-onsite       { background:linear-gradient(135deg,#7f1d1d,#e74c3c)  !important; color:#fff !important; }
+.mode-remote       { background:linear-gradient(135deg,#1e3a6b,#3498db)  !important; color:#fff !important; }
+.status-verified   { background:linear-gradient(135deg,#14532d,#16a34a)  !important; color:#fff !important; }
+.status-pending    { background:linear-gradient(135deg,#92400e,#f59e0b)  !important; color:#fff !important; }
+.status-active     { background:linear-gradient(135deg,#14532d,#22c55e)  !important; color:#fff !important; }
+.status-completed  { background:linear-gradient(135deg,#1e3a8a,#3b82f6)  !important; color:#fff !important; }
+
+/* ============================================================
+   14. BROWSER DARK MODE SUPPORT
+   Keeps Jazzmin/admin text readable when the OS/browser prefers dark.
+   ============================================================ */
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+    }
+
+    body,
+    .content-wrapper,
+    #content,
+    #content-main,
+    .card,
+    .card-body,
+    .module,
+    .inline-group,
+    .tab-content,
+    .form-row,
+    fieldset.module,
+    #changelist,
+    #changelist-filter,
+    #toolbar,
+    .paginator {
+        background: #0f172a !important;
+        color: #e5e7eb !important;
+    }
+
+    .content-header,
+    .card-header,
+    .card-footer,
+    .submit-row,
+    .actions,
+    .object-tools,
+    .change-list .filtered,
+    .results,
+    .table,
+    table {
+        background: #111827 !important;
+        color: #e5e7eb !important;
+        border-color: #334155 !important;
+    }
+
+    #content h1,
+    #content h2,
+    #content h3,
+    #content h4,
+    #content-main h1,
+    #content-main h2,
+    .content-title,
+    .card-title,
+    .module caption,
+    .module h2,
+    #changelist-filter h3,
+    label,
+    .form-row label,
+    .aligned label,
+    .required label,
+    #content-main label {
+        color: #f8fafc !important;
+    }
+
+    #content-main p,
+    .help,
+    .help-block,
+    p.help,
+    .readonly,
+    .form-row div.readonly,
+    .datetimeshortcuts,
+    .timezonewarning,
+    .paginator,
+    .pagination,
+    .actions label,
+    .text-muted,
+    .small-box-footer {
+        color: #cbd5e1 !important;
+    }
+
+    a,
+    #content a,
+    #content-main a,
+    .breadcrumbs a,
+    .paginator a,
+    #changelist-filter a,
+    #result_list tbody td a {
+        color: #7dd3fc !important;
+    }
+
+    a:hover,
+    #content a:hover,
+    #content-main a:hover,
+    .breadcrumbs a:hover,
+    #changelist-filter a:hover {
+        color: #bae6fd !important;
+    }
+
+    .breadcrumbs,
+    .breadcrumbs > *,
+    .breadcrumb,
+    .breadcrumb-item,
+    .breadcrumb-item.active {
+        background: #111827 !important;
+        color: #cbd5e1 !important;
+    }
+
+    #result_list tbody td,
+    #result_list tbody th,
+    .results td,
+    .results th,
+    .table td,
+    .table th {
+        color: #e5e7eb !important;
+        border-color: #334155 !important;
+    }
+
+    #result_list tbody tr:nth-child(odd),
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #111827 !important;
+    }
+
+    #result_list tbody tr:nth-child(even),
+    .table-striped tbody tr:nth-of-type(even) {
+        background-color: #1e293b !important;
+    }
+
+    #result_list tbody tr:hover,
+    .table-hover tbody tr:hover {
+        background-color: #164e63 !important;
+    }
+
+    #result_list thead th,
+    #result_list thead th a,
+    #result_list thead th a:visited,
+    fieldset.module h2,
+    fieldset h2,
+    #changelist-filter h2 {
+        background: linear-gradient(135deg, #020617, #0f172a) !important;
+        color: #67e8f9 !important;
+        border-color: #334155 !important;
+    }
+
+    #content-main input[type="text"],
+    #content-main input[type="email"],
+    #content-main input[type="password"],
+    #content-main input[type="number"],
+    #content-main input[type="date"],
+    #content-main input[type="url"],
+    #content-main input[type="search"],
+    #content-main select,
+    #content-main textarea,
+    #searchbar,
+    #changelist-search input,
+    .select2-container--default .select2-selection--single,
+    .select2-container--default .select2-selection--multiple {
+        background: #020617 !important;
+        color: #f8fafc !important;
+        border-color: #475569 !important;
+    }
+
+    #content-main input::placeholder,
+    #searchbar::placeholder,
+    #changelist-search input::placeholder,
+    textarea::placeholder {
+        color: #94a3b8 !important;
+    }
+
+    #content-main input:focus,
+    #content-main select:focus,
+    #content-main textarea:focus,
+    #searchbar:focus,
+    #changelist-search input:focus {
+        border-color: #38bdf8 !important;
+        box-shadow: 0 0 0 3px rgba(56,189,248,0.25) !important;
+    }
+
+    option,
+    optgroup,
+    .select2-dropdown,
+    .select2-results__option,
+    .select2-search__field {
+        background: #020617 !important;
+        color: #f8fafc !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered,
+    .select2-container--default .select2-selection--multiple .select2-selection__choice,
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        color: #f8fafc !important;
+    }
+
+    #changelist-filter li.selected a {
+        color: #67e8f9 !important;
+    }
+
+    .paginator .this-page,
+    .pagination .page-item.active .page-link {
+        background: #0891b2 !important;
+        border-color: #22d3ee !important;
+        color: #ffffff !important;
+    }
+
+    .messagelist .success,
+    .alert-success {
+        background: #052e16 !important;
+        color: #bbf7d0 !important;
+        border-left-color: #22c55e !important;
+    }
+
+    .messagelist .warning,
+    .alert-warning {
+        background: #451a03 !important;
+        color: #fde68a !important;
+        border-left-color: #f59e0b !important;
+    }
+
+    .messagelist .error,
+    .alert-danger,
+    .errornote,
+    .errors {
+        background: #450a0a !important;
+        color: #fecaca !important;
+        border-left-color: #ef4444 !important;
+    }
+
+    .main-footer,
+    .login-box,
+    .login-card-body,
+    .register-card-body {
+        background: #111827 !important;
+        color: #e5e7eb !important;
+        border-color: #334155 !important;
+    }
+}
+
+/* ============================================================
+   15. FINAL ADMIN READABILITY + JAZZMIN VERSION FOOTER
+   Jazzmin 3 uses app-* wrappers, so these selectors catch those surfaces.
+   ============================================================ */
+.app-footer .float-end,
+.app-footer .float-right,
+.main-footer .float-end,
+.main-footer .float-right {
+    display: none !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    html,
+    html[data-bs-theme="dark"],
+    html[data-bs-theme="dark"] body,
+    html[data-bs-theme="dark"] .app-wrapper,
+    html[data-bs-theme="dark"] .app-main,
+    html[data-bs-theme="dark"] .app-content,
+    html[data-bs-theme="dark"] .app-content-header,
+    html[data-bs-theme="dark"] .container-fluid,
+    html[data-bs-theme="dark"] .content-wrapper {
+        background: #0f172a !important;
+        color: #e5e7eb !important;
+    }
+
+    html[data-bs-theme="dark"] .card,
+    html[data-bs-theme="dark"] .card-body,
+    html[data-bs-theme="dark"] .card-header,
+    html[data-bs-theme="dark"] .card-footer,
+    html[data-bs-theme="dark"] .info-box,
+    html[data-bs-theme="dark"] .small-box,
+    html[data-bs-theme="dark"] .callout,
+    html[data-bs-theme="dark"] .modal-content,
+    html[data-bs-theme="dark"] .dropdown-menu,
+    html[data-bs-theme="dark"] .list-group-item,
+    html[data-bs-theme="dark"] .timeline > div,
+    html[data-bs-theme="dark"] .related-widget-wrapper,
+    html[data-bs-theme="dark"] .selector,
+    html[data-bs-theme="dark"] .selector-available,
+    html[data-bs-theme="dark"] .selector-chosen {
+        background: #111827 !important;
+        color: #e5e7eb !important;
+        border-color: #334155 !important;
+    }
+
+    html[data-bs-theme="dark"] h1,
+    html[data-bs-theme="dark"] h2,
+    html[data-bs-theme="dark"] h3,
+    html[data-bs-theme="dark"] h4,
+    html[data-bs-theme="dark"] h5,
+    html[data-bs-theme="dark"] h6,
+    html[data-bs-theme="dark"] p,
+    html[data-bs-theme="dark"] li,
+    html[data-bs-theme="dark"] span,
+    html[data-bs-theme="dark"] label,
+    html[data-bs-theme="dark"] legend,
+    html[data-bs-theme="dark"] caption,
+    html[data-bs-theme="dark"] .description,
+    html[data-bs-theme="dark"] .form-text,
+    html[data-bs-theme="dark"] .text-body,
+    html[data-bs-theme="dark"] .text-dark,
+    html[data-bs-theme="dark"] .text-muted,
+    html[data-bs-theme="dark"] .readonly {
+        color: #e5e7eb !important;
+    }
+
+    html[data-bs-theme="dark"] .text-secondary,
+    html[data-bs-theme="dark"] .small,
+    html[data-bs-theme="dark"] small,
+    html[data-bs-theme="dark"] .help,
+    html[data-bs-theme="dark"] .helptext,
+    html[data-bs-theme="dark"] .quiet {
+        color: #cbd5e1 !important;
+    }
+
+    html[data-bs-theme="dark"] input,
+    html[data-bs-theme="dark"] select,
+    html[data-bs-theme="dark"] textarea,
+    html[data-bs-theme="dark"] .form-control,
+    html[data-bs-theme="dark"] .form-select,
+    html[data-bs-theme="dark"] .vTextField,
+    html[data-bs-theme="dark"] .vLargeTextField,
+    html[data-bs-theme="dark"] .vIntegerField,
+    html[data-bs-theme="dark"] .vDateField,
+    html[data-bs-theme="dark"] .vTimeField {
+        background: #020617 !important;
+        color: #f8fafc !important;
+        border-color: #475569 !important;
+    }
+
+    html[data-bs-theme="dark"] input::placeholder,
+    html[data-bs-theme="dark"] textarea::placeholder {
+        color: #94a3b8 !important;
+    }
+
+    html[data-bs-theme="dark"] table,
+    html[data-bs-theme="dark"] thead,
+    html[data-bs-theme="dark"] tbody,
+    html[data-bs-theme="dark"] tr,
+    html[data-bs-theme="dark"] td,
+    html[data-bs-theme="dark"] th,
+    html[data-bs-theme="dark"] .table,
+    html[data-bs-theme="dark"] .table tbody,
+    html[data-bs-theme="dark"] .table td,
+    html[data-bs-theme="dark"] .table th {
+        color: #e5e7eb !important;
+        border-color: #334155 !important;
+    }
+
+    html[data-bs-theme="dark"] .table a,
+    html[data-bs-theme="dark"] table a,
+    html[data-bs-theme="dark"] .dropdown-menu a,
+    html[data-bs-theme="dark"] .card a,
+    html[data-bs-theme="dark"] .app-content a {
+        color: #7dd3fc !important;
+    }
+
+    html[data-bs-theme="dark"] .bg-white,
+    html[data-bs-theme="dark"] .bg-light,
+    html[data-bs-theme="dark"] .bg-body,
+    html[data-bs-theme="dark"] .bg-body-tertiary,
+    html[data-bs-theme="dark"] .bg-body-secondary {
+        background-color: #111827 !important;
+        color: #e5e7eb !important;
+    }
+
+    html[data-bs-theme="dark"] .app-footer,
+    html[data-bs-theme="dark"] .main-footer {
+        background: #020617 !important;
+        color: #cbd5e1 !important;
+        border-color: #334155 !important;
+    }
+}

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ICTA Portal - Login</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        /* Deep background matching image_fedba5.jpg */
+        body {
+            background: radial-gradient(circle at 80% 20%, #1e529e 0%, #063170 60%, #031b40 100%);
+            min-height: 100vh;
+        }
+
+        /* The main unified container card matching the registration form border */
+        .portal-container-card {
+            width: 450px;
+            background-color: #ffffff;
+            border-radius: 24px; /* Smooth rounded corners matching the form image */
+            overflow: hidden; /* Ensures the header gradient follows the top border-radius */
+            border: none;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35) !important;
+        }
+
+        /* Exact linear gradient top panel matching image_fedba5.jpg */
+        .portal-top-panel {
+            background: linear-gradient(135deg, #022a61 0%, #0c53a6 50%, #032a61 100%);
+            padding: 25px 24px;
+            position: relative;
+        }
+
+        /* Back link styling */
+        .back-link {
+            color: rgba(255, 255, 255, 0.75) !important;
+            transition: color 0.2s ease;
+            font-size: 0.85rem;
+        }
+        .back-link:hover {
+            color: #ffffff !important;
+        }
+
+        /* Inline header logo block layout */
+        .brand-header-flex {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .brand-logo-badge {
+            background-color: #ffffff;
+            padding: 6px 12px;
+            border-radius: 4px;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .brand-logo-img {
+            max-height: 42px;
+            object-fit: contain;
+        }
+
+        .header-titles {
+            color: #ffffff;
+        }
+
+        .header-main-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        .header-sub-title {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.75);
+            margin: 1px 0 0 0;
+        }
+
+        /* White form body layout container */
+        .portal-form-body {
+            padding: 28px 24px;
+        }
+
+        /* Input control stylistic overrides */
+        .form-control {
+            border: 1px solid #ced4da;
+            padding: 0.65rem 0.75rem;
+            border-radius: 8px;
+        }
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        }
+
+        /* Password addon toggle */
+        .input-group-text {
+            cursor: pointer;
+            background-color: #fff;
+            border-top-right-radius: 8px !important;
+            border-bottom-right-radius: 8px !important;
+        }
+        .input-group-text:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body class="d-flex align-items-center justify-content-center p-3">
+
+    <!-- Unified Form Card Base Container -->
+    <div class="card portal-container-card">
+        
+        <!-- Integrated Top Panel Header Block with linear gradient -->
+        <div class="portal-top-panel">
+            <a href="/" class="back-link text-decoration-none fw-semibold d-flex align-items-center gap-1 mb-2" title="Back to Home">
+                <i class="bi bi-arrow-left"></i> Back to Home
+            </a>
+            
+            <div class="brand-header-flex">
+                <div class="brand-logo-badge">
+                    <img src="/static/images/logo1.png" alt="Ministry & ICT Authority Logo" class="brand-logo-img">
+                </div>
+                <div class="header-titles">
+                    <h1 class="header-main-title">Attachée Login</h1>
+                    <p class="header-sub-title">ICT Authority — Portal Enrolment</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lower White Form Processing Section -->
+        <div class="portal-form-body">
+            
+            {% if messages %}
+                <div id="django-flash-message">
+                    {% for message in messages %}
+                        <div class="alert alert-{% if message.tags == 'success' %}success border-success border-start border-4{% else %}danger border-danger border-start border-4{% endif %} alert-dismissible fade show small py-2 fw-semibold mb-3 shadow-sm" role="alert">
+                            {% if message.tags == 'success' %}
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                            {% else %}
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            {% endif %}
+                            {{ message }}
+                            <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <form method="POST" id="loginForm" onsubmit="handleLoginSubmit(event)">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-secondary small">USERNAME *</label>
+                    <input type="text" name="username" class="form-control" placeholder="Enter username" required>
+                </div>
+                
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label fw-semibold text-secondary small mb-0">PASSWORD *</label>
+                        <a href="{% url 'password_reset' %}" class="text-decoration-none small text-primary fw-medium">Forgot Password?</a>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Enter password" required>
+                        <span class="input-group-text border-start-0" onclick="togglePasswordVisibility()">
+                            <i class="bi bi-eye" id="togglePassIcon"></i>
+                        </span>
+                    </div>
+                </div>
+                
+                <button type="submit" id="submitBtn" class="btn btn-primary w-100 mt-4 fw-bold d-flex align-items-center justify-content-center gap-2 py-2.5 shadow-sm" style="background-color: #0d6efd; border: none; border-radius: 8px;">
+                    <span id="btnText">Sign In</span>
+                    <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                </button>
+                
+                <div class="text-center mt-3 mb-1 d-flex flex-column gap-1">
+                    <a href="{% url 'register_view' %}" class="text-decoration-none text-muted small">New Attachée? Register here</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function togglePasswordVisibility() {
+            const passwordField = document.getElementById('password');
+            const icon = document.getElementById('togglePassIcon');
+            
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+                icon.classList.remove("bi-eye");
+                icon.classList.add("bi-eye-slash");
+            } else {
+                passwordField.type = "password";
+                icon.classList.remove("bi-eye-slash");
+                icon.classList.add("bi-eye");
+            }
+        }
+
+        function handleLoginSubmit(event) {
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
+
+            // Set visual loading state
+            submitBtn.disabled = true; 
+            btnText.textContent = "Verifying Credentials...";
+            btnSpinner.classList.remove('d-none');
+            
+            // Allow form execution to propagate through to server fields
+            return true;
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const alertMessage = document.getElementById("django-flash-message");
+            if (alertMessage) {
+                setTimeout(function() {
+                    const alerts = alertMessage.querySelectorAll('.alert');
+                    alerts.forEach(function(alert) {
+                        const bsAlert = new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    });
+                }, 4000);
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% include 'core/accessibility_snippet.html' %}
+</body>
+</html>

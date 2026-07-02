@@ -1,0 +1,50 @@
+{% extends "jazzmin/ui/base.html" %}
+{% load static %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Find the sidebar link for Attachee Profiles
+            let attacheeProfileLink = document.querySelector('a[href="/admin/core/attacheeprofile/"]');
+            
+            // Fallback: search by text content if href didn't match exactly
+            if (!attacheeProfileLink) {
+                const links = document.querySelectorAll('.nav-sidebar a p');
+                links.forEach(p => {
+                    if (p.textContent.trim().includes('Attachee Profiles')) {
+                        attacheeProfileLink = p.closest('a');
+                    }
+                });
+            }
+
+            if (attacheeProfileLink) {
+                // Fetch the count of pending profiles
+                fetch("{% url 'admin_pending_count' %}")
+                    .then(response => response.json())
+                    .then(data => {
+                        const pendingCount = data.pending_count;
+                        if (pendingCount > 0) {
+                            const textElement = attacheeProfileLink.querySelector('p') || attacheeProfileLink;
+                            
+                            // Check if badge already exists to avoid duplicates
+                            if (!attacheeProfileLink.querySelector('.pending-badge')) {
+                                const badge = document.createElement('span');
+                                badge.className = 'badge badge-danger right pending-badge';
+                                badge.textContent = pendingCount;
+                                badge.style.marginLeft = '8px';
+                                
+                                // Jazzmin usually has <p> tags for labels, otherwise append to link
+                                if (attacheeProfileLink.querySelector('p')) {
+                                    attacheeProfileLink.querySelector('p').appendChild(badge);
+                                } else {
+                                    attacheeProfileLink.appendChild(badge);
+                                }
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Error fetching pending count:', error));
+            }
+        });
+    </script>
+{% endblock %}

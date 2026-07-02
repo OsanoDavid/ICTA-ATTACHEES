@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICTA Portal — Attachée Registration</title>
+    <link rel="icon" type="image/png" href="/static/images/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --icta-blue: #0055b3;
+            --icta-dark: #001f5b;
+            --icta-accent: #00a8e8;
+            --icta-green: #00c875;
+            --step-active: #0055b3;
+            --step-done: #00c875;
+            --step-pending: #d1d5db;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #001f5b 0%, #0055b3 50%, #005fcf 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 16px;
+        }
+
+        /* ─── CARD SHELL ─── */
+        .reg-card {
+            background: #ffffff;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 640px;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.05);
+            overflow: hidden;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── CARD HEADER ─── */
+        .reg-header {
+            background: linear-gradient(135deg, #001f5b, #0055b3);
+            padding: 28px 36px 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reg-header::after {
+            content: '';
+            position: absolute;
+            bottom: -40px; right: -40px;
+            width: 150px; height: 150px;
+            background: radial-gradient(circle, rgba(0,200,117,0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .reg-header-top {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .reg-header-top img {
+            height: 48px;
+            object-fit: contain;
+            filter: brightness(1);
+        }
+
+        .reg-header-titles h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .reg-header-titles p {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.6);
+            margin: 3px 0 0;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255,255,255,0.65);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: color 0.2s ease;
+            margin-bottom: 12px;
+        }
+
+        .back-link:hover { color: #fff; }
+
+        /* ─── STEP INDICATOR ─── */
+        .step-bar {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            position: relative;
+        }
+
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .step-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: 50%;
+            width: 100%;
+            height: 3px;
+            background: var(--step-pending);
+            z-index: 0;
+            transition: background 0.4s ease;
+        }
+
+        .step-item.done:not(:last-child)::after {
+            background: var(--step-done);
+        }
+
+        .step-item.active:not(:last-child)::after {
+            background: linear-gradient(90deg, var(--step-done) 0%, var(--step-pending) 100%);
+        }
+
+        .step-circle {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--step-pending);
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.85rem;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+            border: 3px solid rgba(255,255,255,0.2);
+        }
+
+        .step-item.active .step-circle {
+            background: linear-gradient(135deg, #0055b3, #00a8e8);
+            color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(0,168,232,0.3);
+        }
+
+        .step-item.done .step-circle {
+            background: linear-gradient(135deg, #00a855, #00c875);
+            color: #ffffff;
+        }
+
+        .step-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 6px;
+            color: rgba(255,255,255,0.5);
+            transition: color 0.3s;
+        }
+
+        .step-item.active .step-label { color: #ffffff; }
+        .step-item.done .step-label   { color: rgba(255,255,255,0.8); }
+
+        /* ─── FORM BODY ─── */
+        .reg-body {
+            padding: 32px 36px 28px;
+        }
+
+        .step-panel {
+            display: none;
+            animation: fadePanel 0.35s ease;
+        }
+
+        .step-panel.active {
+            display: block;
+        }
+
+        @keyframes fadePanel {
+            from { opacity: 0; transform: translateX(16px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        .step-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+
+        .step-sub {
+            font-size: 0.82rem;
+            color: #64748b;
+            margin-bottom: 24px;
+        }
+
+        /* ─── FORM FIELDS ─── */
+        .field-group {
+            margin-bottom: 18px;
+        }
+
+        .field-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .field-group label .req {
+            color: #dc2626;
+            margin-left: 2px;
+        }
+
+        .field-group input,
+        .field-group select,
+        .field-group textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: #1a1a2e;
+            background: #f9fafb;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        .field-group input:focus,
+        .field-group select:focus,
+        .field-group textarea:focus {
+            border-color: var(--icta-blue);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(0,85,179,0.12);
+            outline: none;
+        }
+
+        .field-group input.is-invalid,
+        .field-group select.is-invalid {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .field-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        @media (max-width: 480px) {
+            .field-row { grid-template-columns: 1fr; }
+            .reg-body { padding: 24px 20px; }
+            .reg-header { padding: 22px 20px 20px; }
+        }
+
+        /* Password wrapper */
+        .pw-wrap {
+            position: relative;
+        }
+        .pw-wrap input {
+            padding-right: 46px;
+        }
+        .pw-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0;
+            font-size: 1rem;
+            transition: color 0.2s ease;
+        }
+        .pw-toggle:hover { color: var(--icta-blue); }
+
+        /* Select custom arrow */
+        .select-wrap {
+            position: relative;
+        }
+        .select-wrap::after {
+            content: '\f107';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            pointer-events: none;
+            font-size: 0.85rem;
+        }
+
+        /* Date hint */
+        .date-hint {
+            font-size: 0.72rem;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+
+        /* ─── ALERT ─── */
+        .reg-alert {
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .reg-alert.success { background: #dcfce7; color: #166534; border-left: 4px solid #22c55e; }
+        .reg-alert.error   { background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+        .reg-alert.warning { background: #fef3c7; color: #92400e; border-left: 4px solid #f59e0b; }
+
+        /* ─── PASSWORD STRENGTH ─── */
+        .strength-bar {
+            height: 4px;
+            border-radius: 4px;
+            background: #e5e7eb;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .strength-fill {
+            height: 100%;
+            border-radius: 4px;
+            width: 0%;
+            transition: all 0.3s ease;
+        }
+        .strength-label {
+            font-size: 0.72rem;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        /* ─── MISMATCH ERROR ─── */
+        .pw-error {
+            font-size: 0.78rem;
+            color: #dc2626;
+            font-weight: 600;
+            margin-top: 6px;
+            display: none;
+        }
+
+        /* ─── SUMMARY BOX (Step 3 confirmation) ─── */
+        .summary-box {
+            background: linear-gradient(135deg, #f0f6ff, #e8f4ff);
+            border: 2px solid #dbeafe;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .summary-box h5 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 700;
+            color: #0055b3;
+            margin-bottom: 14px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(0,85,179,0.08);
+        }
+
+        .summary-row:last-child { border-bottom: none; }
+
+        .summary-key {
+            font-size: 0.78rem;
+            color: #64748b;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .summary-val {
+            font-size: 0.82rem;
+            color: #1a1a2e;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        /* ─── NAVIGATION BUTTONS ─── */
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            align-items: center;
+        }
+
+        .btn-prev {
+            background: transparent;
+            border: 2px solid #d1d5db;
+            color: #374151;
+            padding: 10px 22px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-prev:hover {
+            border-color: var(--icta-blue);
+            color: var(--icta-blue);
+        }
+
+        .btn-next {
+            flex: 1;
+            background: linear-gradient(135deg, var(--icta-blue), var(--icta-accent));
+            border: none;
+            color: #ffffff;
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(0,85,179,0.35);
+        }
+
+        .btn-next:hover {
+            box-shadow: 0 6px 20px rgba(0,85,179,0.45);
+            transform: translateY(-1px);
+        }
+
+        .btn-submit {
+            flex: 1;
+            background: linear-gradient(135deg, #00a855, #00c875);
+            border: none;
+            color: #001f5b;
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(0,200,117,0.35);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-submit:not(:disabled):hover {
+            box-shadow: 0 6px 20px rgba(0,200,117,0.45);
+            transform: translateY(-1px);
+        }
+
+        /* ─── LOGIN LINK ─── */
+        .login-link {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 0.82rem;
+            color: #64748b;
+        }
+
+        .login-link a {
+            color: var(--icta-blue);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .login-link a:hover { text-decoration: underline; }
+
+        /* ─── OTHER DEPT FIELD ─── */
+        #otherDeptWrapper {
+            margin-top: 12px;
+        }
+
+        /* ─── PROGRESS PERCENT ─── */
+        .progress-line {
+            height: 3px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 2px;
+            margin-top: 18px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00c875, #00a8e8);
+            border-radius: 2px;
+            transition: width 0.4s ease;
+        }
+        .uni-item {
+        padding: 10px 14px;
+        color: rgba(255, 255, 255, 0.85);
+        cursor: pointer;
+        font-size: 13.5px;
+        text-align: left;
+        transition: background 0.2s ease, color 0.2s ease;
+    }
+    .uni-item:hover {
+        background-color: rgba(0, 255, 204, 0.12);
+        color: #00ffcc;
+    }
+    /* Smooth Scrollbar Custom Styles */
+    #university_dropdown_list::-webkit-scrollbar {
+        width: 6px;
+    }
+    #university_dropdown_list::-webkit-scrollbar-track {
+        background: #07111c;
+    }
+    #university_dropdown_list::-webkit-scrollbar-thumb {
+        background: rgba(0, 255, 204, 0.3);
+        border-radius: 4px;
+    }
+    #university_dropdown_list::-webkit-scrollbar-thumb:hover {
+        background: #00ffcc;
+    }
+    </style>
+</head>
+<body>
+
+<div class="reg-card">
+
+    <!-- HEADER -->
+    <div class="reg-header">
+        <a href="/" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i> Back to Home
+        </a>
+
+        <div class="reg-header-top">
+            <img src="/static/images/logo1.png" alt="ICT Authority Logo">
+            <div class="reg-header-titles">
+                <h2>Attachée Registration</h2>
+                <p>ICT Authority of Kenya — Portal Enrolment</p>
+            </div>
+        </div>
+
+        <!-- STEP BAR -->
+        <div class="step-bar" id="stepBar">
+            <div class="step-item active" data-step="1">
+                <div class="step-circle">1</div>
+                <span class="step-label">Personal</span>
+            </div>
+            <div class="step-item" data-step="2">
+                <div class="step-circle">2</div>
+                <span class="step-label">Academic</span>
+            </div>
+            <div class="step-item" data-step="3">
+                <div class="step-circle">
+                    <i class="fa-solid fa-check" style="font-size:0.75rem;"></i>
+                </div>
+                <span class="step-label">Confirm</span>
+            </div>
+        </div>
+
+        <!-- PROGRESS LINE -->
+        <div class="progress-line">
+            <div class="progress-fill" id="progressFill" style="width:10%;"></div>
+        </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="reg-body">
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="reg-alert {% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}warning{% endif %}">
+                    <i class="fa-solid {% if message.tags == 'success' %}fa-circle-check{% elif message.tags == 'error' %}fa-circle-xmark{% else %}fa-triangle-exclamation{% endif %}"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if form.errors %}
+            <div class="reg-alert error">
+                <i class="fa-solid fa-circle-xmark"></i>
+                <ul style="margin: 0; padding-left: 18px;">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <form method="POST" id="registrationForm" action="">
+            {% csrf_token %}
+
+            <!-- ═══════════════════════════════════════
+                 STEP 1 — Personal & Account Details
+            ═══════════════════════════════════════ -->
+            <div class="step-panel active" id="panel-1">
+                <div class="step-title">👤 Personal Details</div>
+                <p class="step-sub">Tell us who you are and create your portal login credentials.</p>
+
+                <div class="field-row">
+                    <div class="field-group">
+                        <label>Full Name <span class="req">*</span></label>
+                        <input type="text" name="full_name" id="fs_full_name" placeholder="e.g., John Kamau" required autocomplete="name" value="{{ form.full_name.value|default_if_none:'' }}">
+                    </div>
+                    <div class="field-group">
+                        <label>Gender <span class="req">*</span></label>
+                        <div class="select-wrap">
+                            <select name="gender" id="fs_gender" required>
+                                <option value="" disabled {% if not form.gender.value %}selected{% endif %}>Select...</option>
+                                <option value="M" {% if form.gender.value == 'M' %}selected{% endif %}>Male</option>
+                                <option value="F" {% if form.gender.value == 'F' %}selected{% endif %}>Female</option>
+                                <option value="O" {% if form.gender.value == 'O' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label>National ID <span class="req">*</span></label>
+                    <input type="text" name="national_id" id="fs_nat_id" placeholder="Enter National ID" required value="{{ form.national_id.value|default_if_none:'' }}">
+                </div>
+
+                <div class="field-row">
+                    <div class="field-group">
+                        <label>Username <span class="req">*</span></label>
+                        <input type="text" name="username" id="fs_username" placeholder="e.g., john.kamau" required autocomplete="username" value="{{ form.username.value|default_if_none:'' }}">
+                    </div>
+                    <div class="field-group">
+                        <label>Email Address <span class="req">*</span></label>
+                        <input type="email" name="email" id="fs_email" placeholder="you@example.com" required autocomplete="email" value="{{ form.email.value|default_if_none:'' }}">
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-group">
+                        <label>Password <span class="req">*</span></label>
+                        <div class="pw-wrap">
+                            <input type="password" name="password" id="fs_password" placeholder="Min. 8 characters" required autocomplete="new-password">
+                            <button type="button" class="pw-toggle" onclick="togglePw('fs_password','icon_pw1')">
+                                <i class="fa-solid fa-eye" id="icon_pw1"></i>
+                            </button>
+                        </div>
+                        <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+                        <div class="strength-label" id="strengthLabel">Enter a password</div>
+                    </div>
+                    <div class="field-group">
+                        <label>Confirm Password <span class="req">*</span></label>
+                        <div class="pw-wrap">
+                            <input type="password" id="fs_confirm" name="confirm_password" placeholder="Re-enter password" required autocomplete="new-password">
+                            <button type="button" class="pw-toggle" onclick="togglePw('fs_confirm','icon_pw2')">
+                                <i class="fa-solid fa-eye" id="icon_pw2"></i>
+                            </button>
+                        </div>
+                        <div class="pw-error" id="pwError">⚠ Passwords do not match</div>
+                    </div>
+                </div>
+
+                <div class="btn-row">
+                    <button type="button" class="btn-next" onclick="goNext(1)">
+                        Continue <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════
+                 STEP 2 — Academic & Placement Info
+            ═══════════════════════════════════════ -->
+            <div class="step-panel" id="panel-2">
+                <div class="step-title">🎓 Academic & Placement</div>
+                <p class="step-sub">Provide your institutional details and attachment period.</p>
+
+                <div class="field-group">
+                    <label>School Registration Number <span class="req">*</span></label>
+                    <input type="text" name="registration_number" id="fs_reg_no" placeholder="e.g., COMP/2021/001" required value="{{ form.registration_number.value|default_if_none:'' }}">
+                </div>
+
+                <div class="field-row">
+                    <div class="field-group">
+                        <label>Course of Study <span class="req">*</span></label>
+                        <input type="text" name="course_name" id="fs_course" placeholder="e.g., BSc. IT" required value="{{ form.course_name.value|default_if_none:'' }}">
+                    </div>
+                            <div class="field-group" style="position: relative; margin-bottom: 20px;">
+    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #fff;">Institution / University <span class="req" style="color: #ff4d4d;">*</span></label>
+    
+    <div style="position: relative;">
+        <input type="text" 
+               name="institution" 
+               id="fs_institution" 
+               placeholder="🔍 Type to search or click to select university..." 
+               autocomplete="off"
+               required 
+               value="{{ form.institution.value|default_if_none:'' }}"
+               style="width: 100%; padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.08); background-color: #07111c; color: #fff; font-size: 14px; transition: border 0.3s ease;">
+        <span id="dropdown_arrow" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: rgba(255, 255, 255, 0.4); pointer-events: none; transition: transform 0.2s;">▼</span>
+    </div>
+
+    <div id="university_dropdown_list" style="display: none; position: absolute; left: 0; right: 0; top: 100%; max-height: 280px; overflow-y: auto; background-color: #1d2836; border: 1px solid rgba(0, 255, 204, 0.2); border-radius: 8px; margin-top: 5px; z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.5); scrollbar-width: thin; scrollbar-color: #00ffcc #07111c;">
+        
+        <div class="uni-item" data-value="Chuka University">Chuka University</div>
+        <div class="uni-item" data-value="Dedan Kimathi University of Technology">Dedan Kimathi University of Technology (DeKUT)</div>
+        <div class="uni-item" data-value="Egerton University">Egerton University</div>
+        <div class="uni-item" data-value="Garissa University">Garissa University</div>
+        <div class="uni-item" data-value="Jomo Kenyatta University of Agriculture and Technology">Jomo Kenyatta University of Agriculture and Technology (JKUAT)</div>
+        <div class="uni-item" data-value="Kabianga University">Kabianga University</div>
+        <div class="uni-item" data-value="Karatina University">Karatina University</div>
+        <div class="uni-item" data-value="Kenyatta University">Kenyatta University</div>
+        <div class="uni-item" data-value="Kibabii University">Kibabii University</div>
+        <div class="uni-item" data-value="Kisii University">Kisii University</div>
+        <div class="uni-item" data-value="Laikipia University">Laikipia University</div>
+        <div class="uni-item" data-value="Maasai Mara University">Maasai Mara University</div>
+        <div class="uni-item" data-value="Machakos University">Machakos University</div>
+        <div class="uni-item" data-value="Maseno University">Maseno University</div>
+        <div class="uni-item" data-value="Masinde Muliro University of Science and Technology">Masinde Muliro University of Science and Technology (MMUST)</div>
+        <div class="uni-item" data-value="Meru University of Science and Technology">Meru University of Science and Technology (MUST)</div>
+        <div class="uni-item" data-value="Moi University">Moi University</div>
+        <div class="uni-item" data-value="Murang'a University of Technology">Murang'a University of Technology (MUT)</div>
+        <div class="uni-item" data-value="Pwani University">Pwani University</div>
+        <div class="uni-item" data-value="Rongo University">Rongo University</div>
+        <div class="uni-item" data-value="South Eastern Kenya University">South Eastern Kenya University (SEKU)</div>
+        <div class="uni-item" data-value="Taita Taveta University">Taita Taveta University (TTU)</div>
+        <div class="uni-item" data-value="Technical University of Kenya">Technical University of Kenya (TUK)</div>
+        <div class="uni-item" data-value="Technical University of Mombasa">Technical University of Mombasa (TUM)</div>
+        <div class="uni-item" data-value="Tom Mboya University">Tom Mboya University (TMU)</div>
+        <div class="uni-item" data-value="Turkana University College">Turkana University College</div>
+        <div class="uni-item" data-value="University of Embu">University of Embu</div>
+        <div class="uni-item" data-value="University of Kabianga">University of Kabianga</div>
+        <div class="uni-item" data-value="University of Nairobi">University of Nairobi (UoN)</div>
+
+        <div class="uni-item" data-value="Adventist University of Africa">Adventist University of Africa</div>
+        <div class="uni-item" data-value="Africa International University">Africa International University</div>
+        <div class="uni-item" data-value="Africa Nazarene University">Africa Nazarene University</div>
+        <div class="uni-item" data-value="Amref International University">Amref International University</div>
+        <div class="uni-item" data-value="Catholic University of Eastern Africa">Catholic University of Eastern Africa (CUEA)</div>
+        <div class="uni-item" data-value="Daystar University">Daystar University</div>
+        <div class="uni-item" data-value="Great Lakes University of Kisumu">Great Lakes University of Kisumu (GLUK)</div>
+        <div class="uni-item" data-value="Gretsa University">Gretsa University</div>
+        <div class="uni-item" data-value="International Leadership University">International Leadership University</div>
+        <div class="uni-item" data-value="Kabarak University">Kabarak University</div>
+        <div class="uni-item" data-value="KCA University">KCA University</div>
+        <div class="uni-item" data-value="Kenya Methodist University">Kenya Methodist University (KeMU)</div>
+        <div class="uni-item" data-value="Kiriri Women’s University of Science and Technology">Kiriri Women’s University of Science and Technology</div>
+        <div class="uni-item" data-value="Management University of Africa">Management University of Africa (MUA)</div>
+        <div class="uni-item" data-value="Marist International University College">Marist International University College</div>
+        <div class="uni-item" data-value="Mount Kenya University">Mount Kenya University (MKU)</div>
+        <div class="uni-item" data-value="Pan Africa Christian University">Pan Africa Christian University</div>
+        <div class="uni-item" data-value="Riara University">Riara University</div>
+        <div class="uni-item" data-value="Sacred Heart University">Sacred Heart University</div>
+        <div class="uni-item" data-value="Scott Christian University">Scott Christian University</div>
+        <div class="uni-item" data-value="St. Paul’s University">St. Paul’s University</div>
+        <div class="uni-item" data-value="Strathmore University">Strathmore University</div>
+        <div class="uni-item" data-value="Tangaza University College">Tangaza University College</div>
+        <div class="uni-item" data-value="United States International University-Africa">United States International University-Africa (USIU)</div>
+        <div class="uni-item" data-value="Uzima University">Uzima University</div>
+        <div class="uni-item" data-value="Zetech University">Zetech University</div>
+        <div class="uni-item" data-value="Other / Not Listed" style="border-top: 1px solid rgba(255,255,255,0.08); color: #00ffcc;">Other / Not Listed</div>
+    </div>
+</div>
+                </div>
+
+                <div class="field-group">
+                    <label>ICTA Department <span class="req">*</span></label>
+                    <div class="select-wrap">
+                        <select name="department" id="fs_dept" onchange="toggleOtherDept()" required>
+                            <option value="" disabled {% if not form.department.value %}selected{% endif %}>— Select Department —</option>
+                            {% for dept in departments %}
+                                <option value="{{ dept.id }}" {% if form.department.value == dept.id|stringformat:'s' %}selected{% endif %}>{{ dept.name }}</option>
+                            {% endfor %}
+                            <option value="OTHER" {% if form.department.value == 'OTHER' %}selected{% endif %}>Other (Specify below)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="field-group d-none" id="otherDeptWrapper">
+                    <label>Specify Department <span class="req">*</span></label>
+                    <input type="text" name="other_department_name" id="fs_other_dept" placeholder="Type your department name" value="{{ form.other_department_name.value|default_if_none:'' }}">
+                </div>
+
+                <div class="field-row">
+                    <div class="field-group">
+                        <label>Attachment Start Date <span class="req">*</span></label>
+                        <input type="date" name="attachment_start_date" id="fs_start_date" required value="{{ form.attachment_start_date.value|default_if_none:'' }}">
+                        <div class="date-hint">When does your attachment begin?</div>
+                    </div>
+                    <div class="field-group">
+                        <label>Attachment End Date <span class="req">*</span></label>
+                        <input type="date" name="attachment_end_date" id="fs_end_date" required value="{{ form.attachment_end_date.value|default_if_none:'' }}">
+                        <div class="date-hint">When does your attachment end?</div>
+                    </div>
+                </div>
+
+                <div class="btn-row">
+                    <button type="button" class="btn-prev" onclick="goPrev(2)">
+                        <i class="fa-solid fa-arrow-left"></i> Back
+                    </button>
+                    <button type="button" class="btn-next" onclick="goNext(2)">
+                        Review <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════
+                 STEP 3 — Review & Submit
+            ═══════════════════════════════════════ -->
+            <div class="step-panel" id="panel-3">
+                <div class="step-title">✅ Review & Submit</div>
+                <p class="step-sub">Please confirm your details before completing your registration.</p>
+
+                <div class="summary-box">
+                    <h5><i class="fa-solid fa-user me-1"></i> Personal Details</h5>
+                    <div class="summary-row">
+                        <span class="summary-key">Full Name</span>
+                        <span class="summary-val" id="sum_name">—</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-key">Gender</span>
+                        <span class="summary-val" id="sum_gender">—</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-key">Username</span>
+                        <span class="summary-val" id="sum_username">—</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-key">Email</span>
+                        <span class="summary-val" id="sum_email">—</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-key">National ID</span>
+                        <span class="summary-val" id="sum_natid">—</span>
+                    </div>
+                </div>
+
+                <div class="summary-box">
+                    <h5><i class="fa-solid fa-graduation-cap me-1"></i> Academic & Placement</h5>
+                    <div class="summary-row">
+                        <span class="summary-key">School Reg No.</span>
+                        <span class="summary-val" id="sum_regno">—</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-key">Course</span>
+                        <span class="summary-val" id="sum_course">—</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-key">Institution</span>
+                        <span class="summary-val" id="sum_institution">—</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-key">Department</span>
+                        <span class="summary-val" id="sum_dept">—</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-key">Start Date</span>
+                        <span class="summary-val" id="sum_start">—</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-key">End Date</span>
+                        <span class="summary-val" id="sum_end">—</span>
+                    </div>
+                </div>
+
+                <div class="btn-row">
+                    <button type="button" class="btn-prev" onclick="goPrev(3)">
+                        <i class="fa-solid fa-arrow-left"></i> Back
+                    </button>
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span id="submitTxt">Submit Application</span>
+                        <span id="submitSpinner" class="d-none">
+                            <i class="fa-solid fa-circle-notch fa-spin"></i>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+        </form>
+
+        <div class="login-link">
+            Already registered? <a href="{% url 'login_view' %}">Sign in to your account</a>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let currentStep = 1;
+    const totalSteps = 3;
+
+    // ─── STEP NAVIGATION ───
+    function updateStepBar(step) {
+        document.querySelectorAll('.step-item').forEach((el, i) => {
+            el.classList.remove('active', 'done');
+            const n = i + 1;
+            if (n < step)        el.classList.add('done');
+            else if (n === step) el.classList.add('active');
+        });
+        const pct = ((step - 1) / (totalSteps - 1)) * 100;
+        document.getElementById('progressFill').style.width = Math.max(pct, 5) + '%';
+    }
+
+    function showPanel(step) {
+        document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('panel-' + step).classList.add('active');
+        updateStepBar(step);
+        currentStep = step;
+    }
+
+    function goNext(from) {
+        if (!validateStep(from)) return;
+        if (from === 2) buildSummary();
+        showPanel(from + 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goPrev(from) {
+        showPanel(from - 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ─── VALIDATION ───
+    function validateStep(step) {
+        let ok = true;
+
+        if (step === 1) {
+            const fullName = v('fs_full_name');
+            const gender   = v('fs_gender');
+            const username = v('fs_username');
+            const email    = v('fs_email');
+            const nationalId = v('fs_nat_id');
+            const password = v('fs_password');
+            const confirm  = document.getElementById('fs_confirm').value;
+
+            if (!fullName) { shake('fs_full_name'); ok = false; }
+            if (!gender)   { shake('fs_gender');    ok = false; }
+            if (!username) { shake('fs_username');  ok = false; }
+            if (!email || !email.includes('@')) { shake('fs_email'); ok = false; }
+            if (!nationalId) { shake('fs_nat_id'); ok = false; }
+            if (password.length < 6) { shake('fs_password'); ok = false; }
+
+            if (password !== confirm) {
+                document.getElementById('pwError').style.display = 'block';
+                shake('fs_confirm');
+                ok = false;
+            } else {
+                document.getElementById('pwError').style.display = 'none';
+            }
+        }
+
+        if (step === 2) {
+            const regno = v('fs_reg_no');
+            const course = v('fs_course');
+            const inst   = v('fs_institution');
+            const dept   = v('fs_dept');
+            const start  = v('fs_start_date');
+            const end    = v('fs_end_date');
+
+            if (!regno)  { shake('fs_reg_no');   ok = false; }
+            if (!course) { shake('fs_course');    ok = false; }
+            if (!inst)   { shake('fs_institution'); ok = false; }
+            if (!dept)   { shake('fs_dept');      ok = false; }
+            if (!start)  { shake('fs_start_date'); ok = false; }
+            if (!end)    { shake('fs_end_date');  ok = false; }
+
+            if (dept === 'OTHER') {
+                const other = v('fs_other_dept');
+                if (!other) { shake('fs_other_dept'); ok = false; }
+            }
+
+            if (start && end && new Date(end) < new Date(start)) {
+                shake('fs_end_date');
+                alert('End date cannot be before start date.');
+                ok = false;
+            }
+        }
+
+        return ok;
+    }
+
+    function v(id) {
+        return document.getElementById(id).value.trim();
+    }
+
+    function shake(id) {
+        const el = document.getElementById(id);
+        el.style.animation = 'none';
+        el.offsetHeight; // reflow
+        el.style.animation = 'shake 0.4s ease';
+        el.classList.add('is-invalid');
+        el.addEventListener('input', () => el.classList.remove('is-invalid'), { once: true });
+
+        if (!document.getElementById('shakeStyle')) {
+            const style = document.createElement('style');
+            style.id = 'shakeStyle';
+            style.textContent = `
+                @keyframes shake {
+                    0%,100%{transform:translateX(0)}
+                    20%{transform:translateX(-6px)}
+                    40%{transform:translateX(6px)}
+                    60%{transform:translateX(-4px)}
+                    80%{transform:translateX(4px)}
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+
+    // ─── SUMMARY ───
+    function buildSummary() {
+        const genderMap = { M: 'Male', F: 'Female' };
+        const deptSelect = document.getElementById('fs_dept');
+        const deptText = deptSelect.value === 'OTHER'
+            ? (v('fs_other_dept') || 'Other')
+            : (deptSelect.options[deptSelect.selectedIndex]?.text || '—');
+
+        const fmt = (d) => {
+            if (!d) return '—';
+            const parts = d.split('-');
+            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            return `${parseInt(parts[2])} ${months[parseInt(parts[1])-1]} ${parts[0]}`;
+        };
+
+        document.getElementById('sum_name').textContent       = v('fs_full_name')   || '—';
+        document.getElementById('sum_gender').textContent     = genderMap[v('fs_gender')] || '—';
+        document.getElementById('sum_username').textContent   = v('fs_username')    || '—';
+        document.getElementById('sum_email').textContent      = v('fs_email')       || '—';
+        document.getElementById('sum_natid').textContent      = v('fs_nat_id')      || '—';
+        document.getElementById('sum_regno').textContent      = v('fs_reg_no')      || '—';
+        document.getElementById('sum_course').textContent     = v('fs_course')      || '—';
+        document.getElementById('sum_institution').textContent = v('fs_institution') || '—';
+        document.getElementById('sum_dept').textContent       = deptText;
+        document.getElementById('sum_start').textContent      = fmt(v('fs_start_date'));
+        document.getElementById('sum_end').textContent        = fmt(v('fs_end_date'));
+    }
+
+    // ─── SUBMIT ───
+    const registrationForm = document.getElementById('registrationForm');
+    registrationForm.addEventListener('submit', function(e) {
+        // If we are not on the last step, prevent submission and go to next
+        if (currentStep < totalSteps) {
+            e.preventDefault();
+            goNext(currentStep);
+            return false;
+        }
+
+        if (!validateStep(currentStep)) {
+            e.preventDefault();
+            return false;
+        }
+
+        const btn = document.getElementById('submitBtn');
+        const txt = document.getElementById('submitTxt');
+        const spin = document.getElementById('submitSpinner');
+        btn.disabled = true;
+        txt.textContent = 'Submitting...';
+        spin.classList.remove('d-none');
+    });
+
+    // ─── PASSWORD TOGGLE ───
+    function togglePw(fieldId, iconId) {
+        const f = document.getElementById(fieldId);
+        const i = document.getElementById(iconId);
+        if (f.type === 'password') {
+            f.type = 'text';
+            i.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            f.type = 'password';
+            i.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleOtherDept();
+    });
+
+    // ─── PASSWORD STRENGTH ───
+    document.getElementById('fs_password').addEventListener('input', function() {
+        const pw = this.value;
+        const fill = document.getElementById('strengthFill');
+        const label = document.getElementById('strengthLabel');
+
+        let score = 0;
+        if (pw.length >= 8) score++;
+        if (/[A-Z]/.test(pw)) score++;
+        if (/[0-9]/.test(pw)) score++;
+        if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+        const configs = [
+            { w: '0%',   bg: '#e5e7eb', txt: 'Enter a password', col: '#6b7280' },
+            { w: '25%',  bg: '#dc2626', txt: 'Weak',    col: '#dc2626' },
+            { w: '50%',  bg: '#f59e0b', txt: 'Fair',    col: '#f59e0b' },
+            { w: '75%',  bg: '#3b82f6', txt: 'Good',    col: '#3b82f6' },
+            { w: '100%', bg: '#22c55e', txt: 'Strong ✓', col: '#16a34a' },
+        ];
+
+        const cfg = configs[pw.length === 0 ? 0 : score];
+        fill.style.width = cfg.w;
+        fill.style.background = cfg.bg;
+        label.textContent = cfg.txt;
+        label.style.color = cfg.col;
+    });
+
+    // ─── DEPT OTHER TOGGLE ───
+    function toggleOtherDept() {
+        const val = document.getElementById('fs_dept').value;
+        const wrap = document.getElementById('otherDeptWrapper');
+        const inp  = document.getElementById('fs_other_dept');
+        if (val === 'OTHER') {
+            wrap.classList.remove('d-none');
+            inp.setAttribute('required', '');
+        } else {
+            wrap.classList.add('d-none');
+            inp.removeAttribute('required');
+        }
+    }
+
+    // ─── CONFIRM PW LIVE CHECK ───
+    document.getElementById('fs_confirm').addEventListener('input', function() {
+        const pw  = document.getElementById('fs_password').value;
+        const err = document.getElementById('pwError');
+        err.style.display = this.value && this.value !== pw ? 'block' : 'none';
+    });
+
+    // Auto dismiss flash messages
+    setTimeout(() => {
+        document.querySelectorAll('.reg-alert').forEach(el => {
+            el.style.transition = 'opacity 0.5s ease';
+            el.style.opacity = '0';
+            setTimeout(() => el.remove(), 500);
+        });
+    }, 5000);
+    document.addEventListener('DOMContentLoaded', function() {
+        const input = document.getElementById('fs_institution');
+        const dropdown = document.getElementById('university_dropdown_list');
+        const arrow = document.getElementById('dropdown_arrow');
+        const items = document.querySelectorAll('.uni-item');
+
+        // Auto-calculate end date (3 months after start)
+        document.getElementById('fs_start_date').addEventListener('change', function() {
+            if (!this.value) return;
+            const start = new Date(this.value);
+            const end = new Date(start);
+            end.setMonth(start.getMonth() + 3);
+            
+            const yyyy = end.getFullYear();
+            const mm = String(end.getMonth() + 1).padStart(2, '0');
+            const dd = String(end.getDate()).padStart(2, '0');
+            document.getElementById('fs_end_date').value = `${yyyy}-${mm}-${dd}`;
+        });
+
+        // Show dropdown on click/focus
+        input.addEventListener('focus', () => {
+            dropdown.style.display = 'block';
+            arrow.style.transform = 'translateY(-50%) rotate(180deg)';
+        });
+
+        // Instant Filter Real-Time Typing Logic
+        input.addEventListener('input', function() {
+            const filter = input.value.toLowerCase();
+            let matches = 0;
+            
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if(text.includes(filter)) {
+                    item.style.display = 'block';
+                    matches++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // Handle item selection click
+        items.forEach(item => {
+            item.addEventListener('click', function() {
+                input.value = this.getAttribute('data-value') || this.textContent;
+                dropdown.style.display = 'none';
+                arrow.style.transform = 'translateY(-50%) rotate(0deg)';
+            });
+        });
+
+        // Dismiss list when user clicks anywhere outside the container box
+        document.addEventListener('click', function(e) {
+            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.style.display = 'none';
+                arrow.style.transform = 'translateY(-50%) rotate(0deg)';
+            }
+        });
+    });
+</script>
+    {% include 'core/accessibility_snippet.html' %}
+</body>
+</html>

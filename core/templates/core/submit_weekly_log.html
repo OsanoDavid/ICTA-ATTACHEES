@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ICTA Portal - Update Logbook</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'attachee_dashboard' %}">
+                <img src="/static/images/logo1.png" alt="Logo" class="bg-white rounded p-1" style="max-height: 35px; object-fit: contain;">
+                <span class="fw-bold tracking-wide text-uppercase small">Logbook Register</span>
+            </a>
+            <a href="{% url 'attachee_dashboard' %}" class="btn btn-sm btn-outline-light px-3 fw-bold">
+                <i class="bi bi-arrow-left me-1"></i> Return Dashboard
+            </a>
+        </div>
+    </nav>
+
+    <div class="container py-4" style="max-width: 850px;">
+        
+        <div class="card shadow-sm border-0 bg-white p-4 rounded-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="fw-bold text-dark mb-1">Weekly Digital Logbook Entry</h4>
+                    <p class="text-muted small mb-0"><i class="bi bi-calendar-event me-1"></i> Week Commencing Monday: <strong>{{ week_start|date:"F d, Y" }}</strong></p>
+                </div>
+                <div>
+                    {% if weekly_log.status == 'REVISION' %}
+                        <span class="badge bg-danger p-2"><i class="bi bi-exclamation-triangle-fill me-1"></i> Requires Revision</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark p-2"><i class="bi bi-clock-history me-1"></i> Review Status: Pending</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if weekly_log.supervisor_remarks %}
+                <div class="alert alert-danger mt-3 mb-0 border-0 small">
+                    <strong class="d-block mb-1"><i class="bi bi-chat-left-text-fill me-1"></i> Supervisor Feedback Remark:</strong>
+                    {{ weekly_log.supervisor_remarks }}
+                </div>
+            {% endif %}
+        </div>
+
+        <form method="POST" class="card shadow-sm border-0 rounded-3 overflow-hidden">
+            {% csrf_token %}
+            {% csrf_token %}
+            <div class="card-header bg-dark text-white fw-bold py-3">
+                <i class="bi bi-pencil-square me-2 text-info"></i>Record Your Daily Tasks Summary
+            </div>
+            <div class="card-body p-4 bg-white d-flex flex-column gap-3">
+                
+                <div>
+                    <label class="form-label fw-bold small text-secondary">MONDAY ACTIVITIES</label>
+                    {{ form.monday_activities }}
+                </div>
+                <div>
+                    <label class="form-label fw-bold small text-secondary">TUESDAY ACTIVITIES</label>
+                    {{ form.tuesday_activities }}
+                </div>
+                <div>
+                    <label class="form-label fw-bold small text-secondary">WEDNESDAY ACTIVITIES</label>
+                    {{ form.wednesday_activities }}
+                </div>
+                <div>
+                    <label class="form-label fw-bold small text-secondary">THURSDAY ACTIVITIES</label>
+                    {{ form.thursday_activities }}
+                </div>
+                <div>
+                    <label class="form-label fw-bold small text-secondary">FRIDAY ACTIVITIES</label>
+                    {{ form.friday_activities }}
+                </div>
+
+                <hr class="my-3 opacity-25">
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'attachee_dashboard' %}" class="btn btn-outline-secondary fw-bold px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary fw-bold px-4 shadow-sm">Save Logbook Entry</button>
+                </div>
+
+            </div>
+        </form>
+
+    </div>
+
+</body>
+</html>

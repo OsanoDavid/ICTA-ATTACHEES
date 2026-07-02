@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ICTA Portal - Grade Assessment</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3">
+        <div class="container">
+            <span class="navbar-brand fw-bold tracking-wide text-uppercase small">Institutional Evaluation Desk</span>
+            <a href="{% url 'supervisor_dashboard' %}" class="btn btn-sm btn-outline-light px-3 fw-bold">Return Desk</a>
+        </div>
+    </nav>
+
+    <div class="container py-5" style="max-width: 800px;">
+        <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+            <div class="card-header bg-dark text-white fw-bold py-3">
+                <i class="bi bi-mortarboard me-2 text-warning"></i>Grade Attachment & Verify Report Submissions
+            </div>
+            <div class="card-body p-4 bg-white">
+                <h5 class="fw-bold text-dark">{{ assessment.attachee.full_name }}</h5>
+                <p class="text-muted small">Reg No: <code>{{ assessment.attachee.registration_number }}</code> &middot; Course Unit: {{ assessment.attachee.course_name }}</p>
+                
+                <div class="p-3 border rounded bg-light mb-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-secondary small d-block">Submitted Document Package:</span>
+                        <a href="{{ assessment.report_file.url }}" target="_blank" class="fw-bold text-danger text-decoration-none">
+                            <i class="bi bi-filetype-pdf fs-5 me-1"></i> Download Student Final Report PDF
+                        </a>
+                    </div>
+                    <span class="text-muted x-small">Uploaded: {{ assessment.report_uploaded_at|date:"M d, Y" }}</span>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" class="d-flex flex-column gap-3">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-secondary">FINAL LETTER GRADE</label>
+                            <select name="final_grade" class="form-select font-monospace" required>
+                                <option value="">Select Grade</option>
+                                <option value="A">A (Excellent)</option>
+                                <option value="B">B (Very Good)</option>
+                                <option value="C">C (Good)</option>
+                                <option value="D">D (Satisfactory)</option>
+                                <option value="F">F (Fail)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label small fw-bold text-secondary">UPLOAD SIGNED EVALUATION SHEET (PDF/IMAGE)</label>
+                            <input type="file" name="evaluation_file" class="form-control font-monospace">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="form-label small fw-bold text-secondary">EXAMINER EVALUATION REMARKS</label>
+                        <textarea name="examiner_remarks" class="form-control font-monospace" rows="4" placeholder="Enter academic wrap-up remarks or feedback summaries here..."></textarea>
+                    </div>
+
+                    <div class="d-flex gap-2 pt-2">
+                        <button type="submit" name="action" value="APPROVE" class="btn btn-success fw-bold py-2 flex-grow-1">
+                            <i class="bi bi-check2-square"></i> Approve & Sign Off Clearance
+                        </button>
+                        <button type="submit" name="action" value="REJECT" class="btn btn-outline-danger fw-bold py-2">
+                            Reject Report
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

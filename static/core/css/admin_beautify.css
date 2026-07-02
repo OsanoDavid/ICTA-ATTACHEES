@@ -1,0 +1,81 @@
+/* Custom Styling for ICTA Admin Portal */
+
+/* 1. Beautify Multi-Select (FilteredSelectMultiple) Widget */
+.selector-available, .selector-chosen {
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+.selector-available h2, .selector-chosen h2 {
+    background: #1a1a2e !important;
+    color: #ffffff !important;
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    padding: 10px !important;
+    border: none !important;
+}
+
+.selector .selector-filter {
+    border: none !important;
+    border-bottom: 2px solid #f1f5f9 !important;
+    padding: 8px !important;
+}
+
+.selector .selector-filter input {
+    border-radius: 8px !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+.selector-available select, .selector-chosen select {
+    border: none !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 13px !important;
+}
+
+.selector .selector-chooser {
+    margin-top: 50px !important;
+}
+
+.selector .selector-add, .selector .selector-remove {
+    background-color: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 50% !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #1a1a2e !important;
+}
+
+/* 2. Beautify the Status Dropdown in Edit Form */
+select[name="status"] {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, #64748b 50%), linear-gradient(135deg, #64748b 50%, transparent 50%);
+    background-position: calc(100% - 20px) calc(1em + 2px), calc(100% - 15px) calc(1em + 2px);
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    padding-right: 40px !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    font-size: 11px !important;
+    letter-spacing: 0.5px !important;
+    border: 2px solid #e2e8f0 !important;
+    transition: all 0.2s ease !important;
+}
+
+select[name="status"]:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* 3. Global Card Styling */
+.card {
+    border-radius: 12px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24) !important;
+    border: none !important;
+}

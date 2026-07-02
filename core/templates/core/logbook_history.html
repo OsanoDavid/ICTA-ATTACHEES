@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ICTA Portal - Logbook History Archive</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+
+    <!-- TOP NAVIGATION BAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'attachee_dashboard' %}">
+                <img src="/static/images/logo1.png" alt="Logo" class="bg-white rounded p-1" style="max-height: 35px; object-fit: contain;">
+                <span class="fw-bold tracking-wide text-uppercase small">Logbook Records Archive</span>
+            </a>
+            <a href="{% url 'attachee_dashboard' %}" class="btn btn-sm btn-outline-light px-3 fw-bold">
+                <i class="bi bi-arrow-left me-1"></i> Return Dashboard
+            </a>
+        </div>
+    </nav>
+
+    <div class="container py-4" style="max-width: 950px;">
+        
+        <!-- ANALYTICS CARDS ROW -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-white p-3 text-center rounded-3">
+                    <span class="text-muted x-small uppercase fw-bold tracking-wider">Total Weeks Logged</span>
+                    <h3 class="fw-bold text-dark mt-1 mb-0">{{ total_weeks }}</h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-success text-white p-3 text-center rounded-3">
+                    <span class="text-white-50 x-small uppercase fw-bold tracking-wider">Approved / Signed Off</span>
+                    <h3 class="fw-bold mt-1 mb-0">{{ approved_weeks }}</h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-warning text-dark p-3 text-center rounded-3">
+                    <span class="text-black-50 x-small uppercase fw-bold tracking-wider">Pending Review</span>
+                    <h3 class="fw-bold mt-1 mb-0">{{ pending_weeks }}</h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-danger text-white p-3 text-center rounded-3">
+                    <span class="text-white-50 x-small uppercase fw-bold tracking-wider">Needs Revision</span>
+                    <h3 class="fw-bold mt-1 mb-0">{{ revision_weeks }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- HISTORY TIMELINE LIST -->
+        <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+            <div class="card-header bg-dark text-white fw-bold py-3 d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-clock-history me-2 text-info"></i>Weekly Timeline Log Folders</span>
+            </div>
+            <div class="card-body p-4 bg-white">
+                {% if all_logs %}
+                    <div class="d-flex flex-column gap-4">
+                        {% for log in all_logs %}
+                            <div class="border rounded-3 p-3 bg-light">
+                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 border-bottom pb-2 mb-3">
+                                    <div>
+                                        <h5 class="fw-bold text-dark mb-0 small">Week Commencing: {{ log.week_start_date|date:"F d, Y" }}</h5>
+                                        <span class="text-muted x-small">Last modified on {{ log.updated_at|date:"M d, Y H:i" }}</span>
+                                    </div>
+                                    <div>
+                                        {% if log.status == 'APPROVED' %}
+                                            <span class="badge bg-success p-2"><i class="bi bi-check-circle-fill me-1"></i> Supervisor Signed Off</span>
+                                        {% elif log.status == 'REVISION' %}
+                                            <span class="badge bg-danger p-2"><i class="bi bi-exclamation-octagon-fill me-1"></i> Revision Requested</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark p-2"><i class="bi bi-hourglass-split me-1"></i> Pending Evaluation</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Preview of weekdays tasks -->
+                                <div class="row g-2 text-secondary x-small font-monospace mb-2">
+                                    <div class="col-md-4"><strong>Mon:</strong> {{ log.monday_activities|default:"-"|truncatewords:8 }}</div>
+                                    <div class="col-md-4"><strong>Tue:</strong> {{ log.tuesday_activities|default:"-"|truncatewords:8 }}</div>
+                                    <div class="col-md-4"><strong>Wed:</strong> {{ log.wednesday_activities|default:"-"|truncatewords:8 }}</div>
+                                    <div class="col-md-4"><strong>Thu:</strong> {{ log.thursday_activities|default:"-"|truncatewords:8 }}</div>
+                                    <div class="col-md-4"><strong>Fri:</strong> {{ log.friday_activities|default:"-"|truncatewords:8 }}</div>
+                                </div>
+
+                                {% if log.supervisor_remarks %}
+                                    <div class="bg-white border-start border-3 border-info p-2 rounded small text-dark mt-2">
+                                        <span class="fw-bold d-block text-muted x-small"><i class="bi bi-reply-fill me-1"></i>Supervisor Feedback:</span>
+                                        "{{ log.supervisor_remarks }}"
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-folder-x display-4 text-secondary d-block mb-2"></i>
+                        <p class="mb-0">No historical logbook sheets found matching your profile tracking matrix.</p>
+                    </div>
+                    
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

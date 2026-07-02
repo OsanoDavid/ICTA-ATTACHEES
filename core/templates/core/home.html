@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="ICT Authority Attachée Management System — Streamlining placement, shift rotations and task management for digital talent development.">
+    <title>ICT Authority — Attachée's Portal</title>
+    <link rel="icon" type="image/png" href="/static/images/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'core/css/home.css' %}">
+</head>
+
+<body>
+
+    <!-- ======================== NAVBAR ======================== -->
+    <nav class="navbar navbar-expand-lg fixed-top navbar-custom">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="/static/images/logo.png" alt="ICT Authority Logo" class="me-2">
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-1">
+                    <li class="nav-item"><a class="nav-link nav-link-custom" href="#"><i
+                                class="fa-solid fa-house me-1"></i>Home</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link nav-link-custom dropdown-toggle" href="#"
+                            data-bs-toggle="dropdown">Training</a>
+                        <ul class="dropdown-menu border-0 shadow-lg rounded-3 py-2">
+                            <li><a class="dropdown-item" href="#courses"><i
+                                        class="fa-solid fa-graduation-cap me-2 text-primary"></i>Digital Talent
+                                    Program</a></li>
+                            <li><a class="dropdown-item" href="#courses"><i
+                                        class="fa-solid fa-certificate me-2 text-success"></i>Professional
+                                    Certification</a></li>
+                            <li><a class="dropdown-item" href="#courses"><i
+                                        class="fa-solid fa-shield-halved me-2 text-danger"></i>Cybersecurity
+                                    Fundamentals</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link nav-link-custom" href="#courses">Partner Training</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-custom" href="#metrics"><i
+                                class="fa-solid fa-chart-simple me-1"></i>Placement Trends</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-custom" href="#support"><i
+                                class="fa-solid fa-headset me-1"></i>Support</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{% url 'login_view' %}" class="btn-nav-login text-decoration-none px-4 py-2"><i
+                            class="fa-solid fa-lock-open me-1"></i>Login</a>
+                    <a href="{% url 'register_view' %}" class="btn-nav-register text-decoration-none px-4 py-2"><i
+                            class="fa-solid fa-user-plus me-1"></i>Register</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ======================== HERO ======================== -->
+    <section class="hero-section">
+        <!-- Floating shapes -->
+        <div class="hero-shape hero-shape-1"></div>
+        <div class="hero-shape hero-shape-2"></div>
+        <div class="hero-shape hero-shape-3"></div>
+
+        <div class="container-fluid px-0">
+            <div class="row g-0 align-items-center w-100 mx-0">
+
+                <!-- LEFT: Text Content -->
+                <div class="col-lg-6 hero-text-col">
+                    <div class="hero-tag">
+                        <span class="dot"></span>
+                        ICT Authority — Kenya
+                    </div>
+
+                    <h1 class="hero-title">
+                        Empowering<br>
+                        <span class="highlight">Digital Talent</span><br>
+                        Across Kenya
+                    </h1>
+
+                    <p class="hero-subtitle">
+                        A centralized platform for managing ICT attachées —
+                        from smart shift rostering and automated task assignments
+                        to digital weekly logbooks and final assessments.
+                    </p>
+
+                    <div class="hero-buttons">
+                        <a href="{% url 'register_view' %}" class="btn-hero-primary">
+                            <i class="fa-solid fa-user-plus"></i> Start Your Attachment
+                        </a>
+                        <a href="{% url 'login_view' %}" class="btn-hero-secondary">
+                            <i class="fa-solid fa-arrow-right-to-bracket"></i> Portal Login
+                        </a>
+                    </div>
+
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">{{ total_placed_count_display|default:"0" }}</span>
+                            <span class="stat-label">Students Placed</span>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item">
+                            <span class="stat-number">{{ current_cohort_count_display|default:"0" }}</span>
+                            <span class="stat-label">Active {{ current_year }}</span>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item">
+                            <span class="stat-number">{{ department_count_display|default:"0" }}</span>
+                            <span class="stat-label">Departments</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: Image -->
+                <div class="col-lg-6 hero-image-col">
+                    <div class="hero-img-wrapper">
+                        <div class="img-ring"></div>
+
+                        <div class="img-badge-tl">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            Verified Portal
+                        </div>
+
+                        <div class="hero-img-card">
+                            <img src="/static/images/back2.png" alt="ICT Authority Attachée Portal">
+                        </div>
+
+                        <div class="img-badge-br">
+                            <i class="fa-solid fa-circle-check" style="color:#22c55e;font-size:1.4rem;"></i>
+                            <div>
+                                <div style="font-weight:800;font-size:0.85rem;color:#1a1a2e;">Fully Automated</div>
+                                <div style="font-size:0.72rem;color:#64748b;">Roster & Task Engine</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================== FEATURES ======================== -->
+    <section class="features-section">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <p class="section-label"><i class="fa-solid fa-star me-1"></i>Core Capabilities</p>
+                <h2 class="section-title mb-3">Everything You Need in<br>One Unified Platform</h2>
+                <p class="section-subtitle">Purpose-built tools designed to streamline every stage of the ICT attachée
+                    lifecycle.</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4 reveal" style="transition-delay:0.1s;">
+                    <div class="feature-card">
+                        <div class="feature-icon-wrap fi-blue">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <h5>Isolated Role Workspaces</h5>
+                        <p>Secure role-based access for Admins, Supervisors, and Attachées — each user sees only what
+                            they're authorized to manage.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 reveal" style="transition-delay:0.2s;">
+                    <div class="feature-card">
+                        <div class="feature-icon-wrap fi-green">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </div>
+                        <h5>Smart Shift Scheduling</h5>
+                        <p>An algorithmic engine auto-distributes on-site and remote days across weeks — with interval,
+                            fixed, and rolling roster modes.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 reveal" style="transition-delay:0.3s;">
+                    <div class="feature-card">
+                        <div class="feature-icon-wrap fi-amber">
+                            <i class="fa-solid fa-clipboard-list"></i>
+                        </div>
+                        <h5>Dynamic Task Fallback</h5>
+                        <p>Attachées on remote days are seamlessly issued tasks by department supervisors to ensure
+                            continued productivity.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================== METRICS ======================== -->
+    <section class="metrics-section" id="metrics">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <p class="section-label" style="color:rgba(255,255,255,0.5);">
+                    <i class="fa-solid fa-chart-bar me-1"></i>Historical Data
+                </p>
+                <h2 class="section-title mb-2" style="color:#ffffff;">Placement Metrics Over 5 Years</h2>
+                <p style="color:rgba(255,255,255,0.55);font-size:0.95rem;">Successful student placements across all ICTA
+                    departments.</p>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-6 col-md reveal" style="transition-delay:0.1s;">
+                    <div class="metric-card">
+                        <div class="metric-year">2022</div>
+                        <div class="metric-number">50+</div>
+                        <span class="metric-badge badge-archived">Archived</span>
+                    </div>
+                </div>
+                <div class="col-6 col-md reveal" style="transition-delay:0.15s;">
+                    <div class="metric-card">
+                        <div class="metric-year">2023</div>
+                        <div class="metric-number">65+</div>
+                        <span class="metric-badge badge-archived">Archived</span>
+                    </div>
+                </div>
+                <div class="col-6 col-md reveal" style="transition-delay:0.2s;">
+                    <div class="metric-card">
+                        <div class="metric-year">2024</div>
+                        <div class="metric-number">55+</div>
+                        <span class="metric-badge badge-archived">Archived</span>
+                    </div>
+                </div>
+                <div class="col-6 col-md reveal" style="transition-delay:0.25s;">
+                    <div class="metric-card">
+                        <div class="metric-year">2025</div>
+                        <div class="metric-number">100+</div>
+                        <span class="metric-badge badge-completed">Completed</span>
+                    </div>
+                </div>
+                <div class="col-6 col-md reveal" style="transition-delay:0.3s;">
+                    <div class="metric-card">
+                        <div class="metric-year">{{ current_year }} (Active)</div>
+                        <div class="metric-number" style="color:#00e59a;">{{ current_cohort_count_display|default:"0" }}
+                        </div>
+                        <span class="metric-badge badge-active">Live Cohort</span>
+                    </div>
+                </div>
+                <div class="col-6 col-md reveal" style="transition-delay:0.35s;">
+                    <div class="metric-total">
+                        <div class="metric-year">Grand Total</div>
+                        <div class="metric-number">{{ total_placed_count_display|default:"0" }}</div>
+                        <span class="metric-badge" style="background:rgba(0,31,91,0.2);color:#001f5b;">All Years</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================== COURSES ======================== -->
+    <section class="courses-section" id="courses">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <p class="section-label"><i class="fa-solid fa-road me-1"></i>Learning Pathways</p>
+                <h2 class="section-title mb-3">Technical Tracks & Training</h2>
+                <p class="section-subtitle">Specialized pathways curated by department heads to accelerate digital
+                    capability.</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4 reveal" style="transition-delay:0.1s;">
+                    <div class="course-card">
+                        <i class="fa-solid fa-network-wired course-icon text-primary"></i>
+                        <span class="course-tag tag-infra">Infrastructure</span>
+                        <h5>Enterprise Network Engineering</h5>
+                        <p>Hands-on management of national fiber backbones, wide-area routing protocols, architecture
+                            diagnostics, and firewall security systems.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 reveal" style="transition-delay:0.2s;">
+                    <div class="course-card">
+                        <i class="fa-solid fa-code course-icon text-success"></i>
+                        <span class="course-tag tag-software">Software</span>
+                        <h5>Full-Stack e-Government Systems</h5>
+                        <p>Building secure state-grade applications. Covers lifecycle pipelines, secure API design,
+                            database schemas, and version-controlled repositories.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 reveal" style="transition-delay:0.3s;">
+                    <div class="course-card">
+                        <i class="fa-solid fa-shield-halved course-icon text-danger"></i>
+                        <span class="course-tag tag-cyber">Cyber Security</span>
+                        <h5>Information Security Management</h5>
+                        <p>Threat detection, encryption protocols, security operations logging, and implementing
+                            administrative risk mitigation control policies.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================== SUPPORT ======================== -->
+    <div class="container" id="support">
+        <div class="support-section reveal">
+            <div class="support-icon-wrap">
+                <i class="fa-solid fa-headset"></i>
+            </div>
+            <div class="support-text">
+                <h4>Need Technical Assistance?</h4>
+                <p>Experiencing issues with logbook synchronization, shift logic, or portal access? Our technical
+                    support desk is ready to help.</p>
+            </div>
+            <a href="mailto:support@icta.go.ke" class="btn-support">
+                <i class="fa-solid fa-envelope me-2"></i>Contact Support Desk
+            </a>
+        </div>
+    </div>
+
+    <!-- ======================== FOOTER ======================== -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4 footer-brand">
+                    <h5 class="mb-3">ICT Authority</h5>
+                    <p style="font-size:0.88rem;line-height:1.7;">
+                        Fostering digital talent, driving automated infrastructure, and centralizing state computing
+                        platforms for shared national prosperity.
+                    </p>
+                </div>
+                <div class="col-md-4 footer-links">
+                    <h6>Quick Navigation</h6>
+                    <a href="#"><i class="fa-solid fa-chevron-right me-2 small" style="color:#0055b3;"></i>Back to
+                        Top</a>
+                    <a href="{% url 'login_view' %}"><i class="fa-solid fa-chevron-right me-2 small"
+                            style="color:#0055b3;"></i>Portal Login</a>
+                    <a href="{% url 'register_view' %}"><i class="fa-solid fa-chevron-right me-2 small"
+                            style="color:#0055b3;"></i>Register Profile</a>
+                    <a href="#metrics"><i class="fa-solid fa-chevron-right me-2 small"
+                            style="color:#0055b3;"></i>Placement Statistics</a>
+                </div>
+                <div class="col-md-4 footer-links">
+                    <h6>Headquarters</h6>
+                    <p style="font-size:0.88rem;line-height:1.9;">
+                        <i class="fa-solid fa-location-dot me-2" style="color:#e63946;"></i>Telposta Towers, 12th
+                        Floor<br>
+                        <span style="padding-left:22px;">Nairobi, Kenya</span>
+                    </p>
+                    <p style="font-size:0.88rem;">
+                        <i class="fa-solid fa-phone me-2" style="color:#22c55e;"></i>+254 20 2211960
+                    </p>
+                </div>
+            </div>
+
+            <div class="footer-divider"></div>
+
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3">
+                <p style="font-size:0.82rem;margin:0;">&copy; 2026 ICT Authority of Kenya. All rights reserved.</p>
+                <div class="d-flex gap-2">
+                    <a href="#" class="social-link"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fa-brands fa-linkedin-in"></i></a>
+                    <a href="#" class="social-link"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="social-link"><i class="fa-brands fa-facebook-f"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Scroll reveal animation
+        const reveals = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.12 });
+
+        reveals.forEach(el => observer.observe(el));
+
+        // Navbar shadow on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('.navbar-custom');
+            if (window.scrollY > 30) {
+                nav.style.boxShadow = '0 4px 30px rgba(0,85,179,0.18)';
+            } else {
+                nav.style.boxShadow = '0 2px 20px rgba(0,85,179,0.12)';
+            }
+        });
+    </script>
+    {% include 'core/accessibility_snippet.html' %}
+</body>
+
+</html>

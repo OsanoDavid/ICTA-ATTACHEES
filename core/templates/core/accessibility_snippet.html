@@ -1,0 +1,153 @@
+<!-- Accessibility Sidebar Snippet (v4 - Premium Design) -->
+<link rel="stylesheet" href="/static/css/accessibility.css">
+
+<style>
+    .theme-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid white;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: all 0.2s;
+    }
+    .theme-circle:hover { transform: translateY(-3px); box-shadow: 0 5px 12px rgba(0,0,0,0.3); }
+    .tc-red { background: linear-gradient(to bottom, #f44336, #b71c1c); }
+    .tc-yellow { background: linear-gradient(to bottom, #ffeb3b, #fbc02d); }
+    .tc-blue { background: linear-gradient(to bottom, #2196f3, #0d47a1); }
+    .tc-default { background: #eeeeee; }
+    
+    .acc-divider {
+        height: 1px;
+        background: rgba(0,0,0,0.06);
+        margin: 20px 0;
+    }
+</style>
+
+<div id="accessibility-widget">
+    <button id="accessibility-btn" onclick="toggleAccPanel()" title="Open Accessibility Desk">
+        <i class="bi bi-person-fill-check"></i>
+    </button>
+</div>
+
+<div id="accessibility-panel">
+    <div class="acc-title mb-4">
+        <div class="bg-primary text-white p-2 rounded-3 me-2">
+            <i class="bi bi-universal-access"></i>
+        </div>
+        <span class="text-dark">Portal Accessibility</span>
+    </div>
+
+    <!-- 1. Text Controls -->
+    <div class="acc-section">
+        <span class="acc-label text-primary">Font Scaling</span>
+        <div class="d-flex align-items-center gap-2">
+            <button onclick="changeFontSize(-15)"
+                style="flex:1; height:52px; font-size:1.8rem; font-weight:900;
+                       background:#dc3545; color:white; border:none; border-radius:12px;
+                       cursor:pointer; box-shadow:0 3px 10px rgba(220,53,69,0.4);
+                       transition:transform 0.15s;"
+                onmousedown="this.style.transform='scale(0.93)'"
+                onmouseup="this.style.transform='scale(1)'">&#8722;</button>
+            <div style="text-align:center; min-width:68px;">
+                <div id="acc-font-display"
+                     style="font-size:1.3rem; font-weight:800; color:#0d6efd;">100%</div>
+                <div style="font-size:0.62rem; color:#999; letter-spacing:1px; text-transform:uppercase;">Font Size</div>
+            </div>
+            <button onclick="changeFontSize(15)"
+                style="flex:1; height:52px; font-size:1.8rem; font-weight:900;
+                       background:#198754; color:white; border:none; border-radius:12px;
+                       cursor:pointer; box-shadow:0 3px 10px rgba(25,135,84,0.4);
+                       transition:transform 0.15s;"
+                onmousedown="this.style.transform='scale(0.93)'"
+                onmouseup="this.style.transform='scale(1)'">+</button>
+        </div>
+    </div>
+
+    <div class="acc-divider"></div>
+
+    <!-- 2. Intelligence Section -->
+    <div class="acc-section">
+        <span class="acc-label text-primary">Voice-First Navigation</span>
+        <button class="btn btn-dark w-100 py-3 d-flex align-items-center justify-content-center gap-2 fw-bold shadow-sm rounded-3" onclick="startVoiceAssistant()">
+            <i class="bi bi-mic-fill text-info"></i> Engage Voice Engine
+        </button>
+    </div>
+
+    <div class="acc-divider"></div>
+
+    <!-- 3. Reading Tools -->
+    <div class="acc-section">
+        <span class="acc-label text-primary">Reading Assistance</span>
+        <div class="acc-grid">
+            <div class="acc-option py-3" onclick="toggleAccSetting('dyslexic')">
+                <i class="bi bi-fonts d-block mb-1"></i> Dyslexic
+            </div>
+            <div class="acc-option py-3" onclick="location.reload()">
+                <i class="bi bi-arrow-clockwise d-block mb-1"></i> Reset
+            </div>
+        </div>
+    </div>
+
+    <div class="acc-divider"></div>
+
+    <!-- Font Family Selector (ADDED) -->
+    <div class="acc-section">
+        <span class="acc-label text-primary">Font Family</span>
+        <select class="form-select form-select-sm shadow-sm" onchange="changeFont(this.value)">
+            <option value="">— Default System Font —</option>
+            <option value="'Arial', sans-serif">Arial (Clean)</option>
+            <option value="'Georgia', serif">Georgia (Serif)</option>
+            <option value="'Courier New', monospace">Courier New (Mono)</option>
+            <option value="'Verdana', sans-serif">Verdana (Wide)</option>
+            <option value="'Trebuchet MS', sans-serif">Trebuchet (Rounded)</option>
+            <option value="'Comic Sans MS', cursive">Comic Sans (Dyslexia)</option>
+            <option value="'Times New Roman', serif">Times New Roman</option>
+        </select>
+    </div>
+
+    <div class="acc-divider"></div>
+
+    <!-- Visual Display Options -->
+    <div class="acc-section">
+        <span class="acc-label text-primary">Visual Display Options</span>
+        <div class="acc-grid">
+            <div class="acc-option py-3" onclick="toggleDisplayMode('dark')" id="btn-dark">
+                <i class="bi bi-moon-stars-fill d-block mb-1"></i> Dark Mode
+            </div>
+            <div class="acc-option py-3" onclick="toggleDisplayMode('contrast')" id="btn-contrast">
+                <i class="bi bi-circle-half d-block mb-1"></i> High Contrast
+            </div>
+            <div class="acc-option py-3" onclick="toggleDisplayMode('grayscale')" id="btn-gray">
+                <i class="bi bi-palette2 d-block mb-1"></i> Greyscale
+            </div>
+            <div class="acc-option py-3" onclick="toggleDisplayMode('sepia')" id="btn-sepia">
+                <i class="bi bi-brightness-high d-block mb-1"></i> Warm Sepia
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-auto">
+        <!-- 4. Themes (Moved to bottom as requested) -->
+        <div class="acc-section border-top pt-4">
+            <span class="acc-label text-primary text-center">Interface Themes</span>
+            <div class="d-flex justify-content-center gap-3">
+                <div class="theme-circle tc-default" onclick="setTheme('default')" title="Standard"></div>
+                <div class="theme-circle tc-red" onclick="setTheme('red')" title="Red Mode"></div>
+                <div class="theme-circle tc-yellow" onclick="setTheme('yellow')" title="Yellow Mode"></div>
+                <div class="theme-circle tc-blue" onclick="setTheme('blue')" title="Blue Mode"></div>
+            </div>
+        </div>
+
+        <button class="btn btn-outline-danger btn-sm w-100 mt-4 fw-bold p-2 rounded-3 border-2" onclick="toggleAccPanel()">
+            <i class="bi bi-chevron-right"></i> Hide Sidebar
+        </button>
+    </div>
+</div>
+
+<div id="voice-overlay">
+    <div class="voice-wave"></div>
+    <h2 class="mt-5 fw-bold" id="voice-status">Analyzing Voice Input...</h2>
+</div>
+
+<script src="/static/js/accessibility.js"></script>

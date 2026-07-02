@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ICTA Portal - Upload Final Report</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3">
+        <div class="container">
+            <span class="navbar-brand fw-bold tracking-wide text-uppercase small">Industrial Final Assessment Desk</span>
+            <a href="{% url 'attachee_dashboard' %}" class="btn btn-sm btn-outline-light px-3 fw-bold">Return Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container py-5" style="max-width: 650px;">
+        <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+            <div class="card-header bg-dark text-white fw-bold py-3">
+                <i class="bi bi-cloud-arrow-up me-2 text-info"></i>Upload Attachment Final Report
+            </div>
+            <div class="card-body p-4 bg-white">
+                {% if assessment.report_status == 'APPROVED' %}
+                    <div class="alert alert-success text-center py-4 border-0 rounded-3 mb-0">
+                        <i class="bi bi-patch-check-fill text-success display-5 d-block mb-2"></i>
+                        <h5 class="fw-bold">Attachment Cleared & Certified!</h5>
+                        <p class="small text-secondary mb-2">Your report has been fully verified and signed off.</p>
+                        <span class="badge bg-dark p-2 font-monospace">FINAL GRADE ASSIGNED: {{ assessment.final_grade }}</span>
+                    </div>
+                {% else %}
+                    <form method="POST" enctype="multipart/form-data" class="d-flex flex-column gap-3">
+                        {% csrf_token %}
+                        <div class="p-3 bg-light border rounded small text-secondary">
+                            <h6 class="fw-bold text-dark mb-1 small"><i class="bi bi-info-circle me-1 text-primary"></i> Submission Guidelines</h6>
+                            Ensure your final report contains all required signature pages and is compiled purely into a single **PDF format** under 10MB.
+                        </div>
+
+                        <div>
+                            <label class="form-label small fw-bold text-dark">SELECT FINAL REPORT FILE (PDF ONLY)</label>
+                            <input type="file" name="report_file" class="form-control font-monospace" accept=".pdf" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary fw-bold py-2 shadow-sm mt-2">
+                            <i class="bi bi-upload me-1"></i> Upload & Submit Document
+                        </button>
+                    </form>
+
+                    {% if assessment.report_file %}
+                        <div class="mt-4 pt-3 border-top">
+                            <span class="text-muted x-small uppercase fw-bold tracking-wider d-block mb-2">Current Active Submission Status:</span>
+                            <div class="p-3 border rounded d-flex justify-content-between align-items-center bg-light">
+                                <div>
+                                    <a href="{{ assessment.report_file.url }}" target="_blank" class="fw-bold text-primary text-decoration-none small">
+                                        <i class="bi bi-file-earmark-pdf text-danger me-1"></i> Review Active Uploaded PDF
+                                    </a>
+                                    <span class="text-muted d-block x-small mt-1">Submitted: {{ assessment.report_uploaded_at|date:"M d, Y H:i" }}</span>
+                                </div>
+                                {% if assessment.report_status == 'PENDING' %}
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split"></i> Review Pending</span>
+                                {% elif assessment.report_status == 'REJECTED' %}
+                                    <span class="badge bg-danger"><i class="bi bi-exclamation-triangle"></i> Revision Required</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
