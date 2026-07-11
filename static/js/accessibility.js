@@ -23,14 +23,19 @@
 
     window.setTheme = function(theme) {
         const body = document.body;
-        // Remove all previous themes
-        body.classList.remove('theme-red', 'theme-yellow', 'theme-blue');
+        const themeClass = `theme-${theme}`;
         
-        if (theme !== 'default') {
-            body.classList.add(`theme-${theme}`);
-            speak(`${theme} high visibility theme activated`);
-        } else {
+        if (theme !== 'default' && body.classList.contains(themeClass)) {
+            body.classList.remove(themeClass);
             speak("Default theme restored");
+        } else {
+            body.classList.remove('theme-red', 'theme-yellow', 'theme-blue');
+            if (theme !== 'default') {
+                body.classList.add(themeClass);
+                speak(`${theme} high visibility theme activated`);
+            } else {
+                speak("Default theme restored");
+            }
         }
     };
 
@@ -58,25 +63,16 @@
     const activeModes = {}; // track each mode independently
 
     window.toggleDisplayMode = function(mode) {
-        const styleId = 'acc-style-' + mode;
-        const existing = document.getElementById(styleId);
         const btn = document.getElementById(btnMap[mode]);
 
-        if (existing) {
+        if (activeModes[mode]) {
             // Already active — turn OFF this mode
-            existing.remove();
-            if (btn) btn.classList.remove('mode-active');
             delete activeModes[mode];
+            reapplyFilters();
+            if (btn) btn.classList.remove('mode-active');
             speak(mode + ' off');
         } else {
-            // Turn ON this mode by injecting its own style tag
-            const style = document.createElement('style');
-            style.id = styleId;
-            style.textContent =
-                'body > *:not(#accessibility-panel):not(#accessibility-widget):not(#voice-overlay) {' +
-                '  filter: ' + buildCombinedFilter(mode) + ' !important;' +
-                '}';
-            // Remove existing combined styles and re-inject all active + new
+            // Turn ON this mode
             activeModes[mode] = filterMap[mode];
             reapplyFilters();
             if (btn) btn.classList.add('mode-active');
@@ -89,23 +85,21 @@
     }
 
     function reapplyFilters() {
-        // Remove all individual style tags and inject one combined style
-        Object.keys(filterMap).forEach(m => {
-            const s = document.getElementById('acc-style-' + m);
-            if (s) s.remove();
-        });
-        const combined = buildCombinedFilter();
-        if (!combined) return;
-        const style = document.createElement('style');
-        style.id = 'acc-style-combined';
         const old = document.getElementById('acc-style-combined');
         if (old) old.remove();
+        
+        const combined = buildCombinedFilter();
+        if (!combined) return;
+
+        const style = document.createElement('style');
+        style.id = 'acc-style-combined';
         style.textContent =
             'body > *:not(#accessibility-panel):not(#accessibility-widget):not(#voice-overlay) {' +
             '  filter: ' + combined + ' !important;' +
             '}';
         document.head.appendChild(style);
     }
+
 
     // Font Family Switcher
     window.changeFont = function(family) {
