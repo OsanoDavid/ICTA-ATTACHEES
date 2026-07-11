@@ -15,7 +15,7 @@ The repository includes `render.yaml`, which provisions a web service and Postgr
 1. Push this repository to GitHub.
 2. In Render, select **New → Blueprint** and select the GitHub repository.
 3. Confirm the generated services, then deploy.
-4. After the first deployment, open the Render Shell and run `python manage.py createsuperuser`.
+4. In the Render web-service environment settings, add `ADMIN_USERNAME`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD`. The next deploy creates this account automatically.
 5. Add `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, and `DEFAULT_FROM_EMAIL` in the Render web-service environment settings if email/password resets are required.
 
 Do not commit `.env`, `db.sqlite3`, uploaded reports, or real email credentials.
