@@ -26,6 +26,34 @@ from .forms import WeeklyLogForm, AttacheeRegistrationForm
 from .utils import generate_weekly_shifts
 
 User = get_user_model()
+import datetime
+from datetime import timedelta
+from django.http import JsonResponse
+from django.utils import timezone
+from django.conf import settings
+from django.core.mail import send_mail
+from django.db import transaction
+from django.urls import reverse_lazy
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import PasswordResetView
+
+from .models import (
+    AttacheeProfile, 
+    ShiftAssignment, 
+    Task, 
+    Department, 
+    FinalAssessment, 
+    GeneratedShift, 
+    WeeklyLog,
+    RosterConfiguration
+)
+from .forms import WeeklyLogForm, AttacheeRegistrationForm
+from .utils import generate_weekly_shifts
+
+User = get_user_model()
 
 
 # =========================================================================
@@ -64,7 +92,17 @@ def login_view(request):
     if request.method == 'POST':
         user_in = request.POST.get('username')
         pass_in = request.POST.get('password')
-        user = authenticate(request, username=user_in, password=pass_in)
+        
+        # Check if user_in is a registration number
+        username_to_auth = user_in
+        try:
+            profile = AttacheeProfile.objects.get(registration_number__iexact=user_in)
+            username_to_auth = profile.user.username
+        except AttacheeProfile.DoesNotExist:
+            pass
+
+        user = authenticate(request, username=username_to_auth, password=pass_in)
+
         
         if user is not None:
             # Django superusers must always be able to access the Django admin,
