@@ -14,6 +14,10 @@ services:
         fromDatabase:
           name: icta-attachees-db
           property: connectionString
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://*.onrender.com"
 databases:
   - name: icta-attachees-db
     plan: free
