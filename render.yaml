@@ -4,7 +4,7 @@ services:
     plan: free
     runtime: python
     buildCommand: bash build.sh
-    startCommand: gunicorn attachees.wsgi:application
+    startCommand: python manage.py migrate && python manage.py seed_departments && python manage.py bootstrap_superuser && gunicorn attachees.wsgi:application
     envVars:
       - key: SECRET_KEY
         generateValue: true
