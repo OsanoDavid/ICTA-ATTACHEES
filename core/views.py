@@ -67,6 +67,13 @@ def login_view(request):
         user = authenticate(request, username=user_in, password=pass_in)
         
         if user is not None:
+            # Django superusers must always be able to access the Django admin,
+            # even if their optional portal role was set incorrectly.
+            if user.is_superuser or user.role == 'ADMIN':
+                login(request, user)
+                messages.success(request, f"Admin portal accessed securely as {user.username}.")
+                return redirect('/admin/')
+
             # Enforce business rule: Check if an ATTACHEE is still PENDING verification
             if user.role == 'ATTACHEE':
                 try:
@@ -90,9 +97,6 @@ def login_view(request):
                 messages.success(request, "Login successful! Welcome to your Attachée Dashboard.")
                 return redirect('attachee_dashboard')
                 
-            elif user.role == 'ADMIN':
-                messages.success(request, f"Admin portal accessed securely as {user.username}.")
-                return redirect('/admin/')
         else:
             messages.error(request, 'Invalid username or password credentials.')
             

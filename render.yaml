@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: icta-attachees
+    plan: free
+    runtime: python
+    buildCommand: bash build.sh
+    startCommand: gunicorn attachees.wsgi:application
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        fromService:
+          type: web
+          name: icta-attachees
+          property: host
+      - key: CSRF_TRUSTED_ORIGINS
+        fromService:
+          type: web
+          name: icta-attachees
+          property: url
+      - key: DATABASE_URL
+        fromDatabase:
+          name: icta-attachees-db
+          property: connectionString
+databases:
+  - name: icta-attachees-db
+    plan: free
