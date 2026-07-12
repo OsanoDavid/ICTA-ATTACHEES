@@ -208,21 +208,21 @@
         });
 
         // Phase 2: After loader delay, hide loader then sprout content in waves
-        const LOADER_DURATION = 600; // ms — how long loader shows (keep spinner)
-        const SPROUT_DELAY   = 220;  // ms between each sprout wave (lovely slow motion)
+        const LOADER_DURATION = 350; // ms — loader hides faster so page loading starts sooner
+        const SPROUT_DELAY   = 160;  // ms between each sprout wave for a graceful stagger
 
         setTimeout(() => {
             // Fade out loader
             if (loader) loader.classList.add('loaded');
 
-            // After loader finishes fading, stagger sprout the content
+            // After loader starts fading, stagger sprout the content
             setTimeout(() => {
                 sproutTargets.forEach((el, i) => {
                     setTimeout(() => {
                         el.classList.add('sprouted');
                     }, i * SPROUT_DELAY);
                 });
-            }, 150);
+            }, 100);
         }, LOADER_DURATION);
 
         // ===== NAVIGATION LINK INTERCEPTOR =====
