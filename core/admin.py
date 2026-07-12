@@ -39,7 +39,7 @@ class CustomUserAdmin(UserAdmin):
     fieldsets = (
         ('🔐 Account Credentials', {'fields': ('username', 'password')}),
         ('👤 Personal Details', {'fields': ('first_name', 'last_name', 'email')}),
-        ('🎭 System Role Assignment', {'fields': ('role', 'is_staff', 'is_active', 'is_superuser')}),
+        ('🎭 System Role Assignment', {'fields': ('role', 'department', 'is_staff', 'is_active', 'is_superuser')}),
         ('📅 Important Dates', {'fields': ('last_login', 'date_joined')}),
     )
     list_display = ['get_user_display', 'email', 'get_role_badge', 'get_category_label', 'is_active_badge']

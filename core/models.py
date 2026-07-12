@@ -16,9 +16,12 @@ class User(AbstractUser):
         ('ATTACHEE', 'ICT Attachée'),
     )
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='ATTACHEE')
+    # Link supervisor users to a specific Department they manage
+    department = models.ForeignKey('Department', on_delete=models.SET_NULL, null=True, blank=True, related_name='supervisors')
 
     def __str__(self):
-        return f"{self.username} ({self.get_role_display()})"
+        dept_info = f" - {self.department.name}" if self.department else ""
+        return f"{self.username} ({self.get_role_display()}{dept_info})"
 
 
 # 2. ICT Authority Departments

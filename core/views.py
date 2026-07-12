@@ -25,33 +25,6 @@ from .models import (
 from .forms import WeeklyLogForm, AttacheeRegistrationForm
 from .utils import generate_weekly_shifts
 
-User = get_user_model()
-import datetime
-from datetime import timedelta
-from django.http import JsonResponse
-from django.utils import timezone
-from django.conf import settings
-from django.core.mail import send_mail
-from django.db import transaction
-from django.urls import reverse_lazy
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout, get_user_model
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import PasswordResetView
-
-from .models import (
-    AttacheeProfile, 
-    ShiftAssignment, 
-    Task, 
-    Department, 
-    FinalAssessment, 
-    GeneratedShift, 
-    WeeklyLog,
-    RosterConfiguration
-)
-from .forms import WeeklyLogForm, AttacheeRegistrationForm
-from .utils import generate_weekly_shifts
 
 User = get_user_model()
 
@@ -59,6 +32,7 @@ User = get_user_model()
 # =========================================================================
 # CORE CORE/AUTHENTICATION VIEWS
 # =========================================================================
+
 
 def home_view(request):
     current_year = timezone.now().year
@@ -482,28 +456,35 @@ def supervisor_dashboard(request):
     if request.user.role != 'SUPERVISOR':
         return redirect('login_view')
         
-    # Trigger status updates for all active/approved attachees to keep dashboard fresh
-    for p in AttacheeProfile.objects.filter(status__in=['APPROVED', 'ACTIVE']):
+    dept = request.user.department
+    if not dept:
+        return render(request, 'core/supervisor_dashboard.html', {'no_department': True})
+        
+    # Trigger status updates for all active/approved attachees in this department
+    for p in AttacheeProfile.objects.filter(status__in=['APPROVED', 'ACTIVE'], department=dept):
         p.update_status()
 
-    pending_profiles = AttacheeProfile.objects.filter(status='PENDING')
-    pending_assessments = FinalAssessment.objects.filter(report_status='PENDING').select_related('attachee')
+    pending_profiles = AttacheeProfile.objects.filter(status='PENDING', department=dept)
+    pending_assessments = FinalAssessment.objects.filter(report_status='PENDING', attachee__department=dept).select_related('attachee')
     
     # Fetch logs submitted by attachées that need signature verification
-    submitted_logs = WeeklyLog.objects.filter(status='PENDING').select_related('attachee')
+    submitted_logs = WeeklyLog.objects.filter(status='PENDING', attachee__department=dept).select_related('attachee')
     
     today_date = datetime.date.today()
     week_start = today_date - timedelta(days=today_date.weekday())
-    active_shifts = ShiftAssignment.objects.filter(week_start_date=week_start)
+    active_shifts = ShiftAssignment.objects.filter(week_start_date=week_start, attachee__department=dept)
     
     current_weekday = today_date.strftime('%A')
     on_site_today_count = ShiftAssignment.objects.filter(
         week_start_date=week_start, 
-        assigned_day=current_weekday
+        assigned_day=current_weekday,
+        attachee__department=dept
     ).count()
-    total_managed_count = AttacheeProfile.objects.filter(status='APPROVED').count()
+    total_managed_count = AttacheeProfile.objects.filter(status__in=['APPROVED', 'ACTIVE'], department=dept).count()
 
     context = {
+        'no_department': False,
+        'department_name': dept.name,
         'pending_profiles': pending_profiles,
         'pending_assessments': pending_assessments,
         'submitted_logs': submitted_logs,
@@ -520,7 +501,16 @@ def approve_attachee(request, profile_id):
     if request.user.role != 'SUPERVISOR':
         return redirect('login_view')
         
+    dept = request.user.department
+    if not dept:
+        messages.error(request, "You have not been assigned to a department.")
+        return redirect('supervisor_dashboard')
+        
     profile = get_object_or_404(AttacheeProfile, id=profile_id)
+    if profile.department != dept:
+        messages.error(request, "Access Denied: This attachée belongs to another department.")
+        return redirect('supervisor_dashboard')
+        
     profile.status = 'APPROVED'
     profile.update_status() # Immediately check if they should be ACTIVE today
     profile.save()
@@ -534,7 +524,16 @@ def reject_attachee(request, profile_id):
     if request.user.role != 'SUPERVISOR':
         return redirect('login_view')
         
+    dept = request.user.department
+    if not dept:
+        messages.error(request, "You have not been assigned to a department.")
+        return redirect('supervisor_dashboard')
+        
     profile = get_object_or_404(AttacheeProfile, id=profile_id)
+    if profile.department != dept:
+        messages.error(request, "Access Denied: This attachée belongs to another department.")
+        return redirect('supervisor_dashboard')
+        
     profile.status = 'REJECTED'
     profile.save()
     
@@ -547,21 +546,23 @@ def trigger_roster_engine(request):
     if request.user.role != 'SUPERVISOR':
         return redirect('login_view')
         
+    dept = request.user.department
+    if not dept:
+        messages.error(request, "You have not been assigned to a department.")
+        return redirect('supervisor_dashboard')
+        
     today_date = datetime.date.today()
     week_start = today_date - timedelta(days=today_date.weekday())
     
     try:
-        # Fetch all verified departments to ensure rotational coverage across the whole organization
-        verified_depts = Department.objects.filter(is_verified=True)
-        completed_depts = 0
-        
+        if not dept.is_verified:
+            raise Exception("Your department is not verified.")
+            
         with transaction.atomic():
-            for dept in verified_depts:
-                # Automated logic matches ACTIVE students to the weekday matrix
-                generate_weekly_shifts(department_id=dept.id, week_start_date=week_start)
-                completed_depts += 1
+            # Automated logic matches ACTIVE students to the weekday matrix of this department only
+            generate_weekly_shifts(department_id=dept.id, week_start_date=week_start)
                 
-        messages.success(request, f"Roster engine executed! Aligned rotations for {completed_depts} departments for week of {week_start}.")
+        messages.success(request, f"Roster engine executed! Aligned rotations for {dept.name} department for week of {week_start}.")
     except Exception as e:
         messages.error(request, f"Engine execution halted: {str(e)}")
         
@@ -573,29 +574,40 @@ def review_logbook(request, log_id):
     if request.user.role != 'SUPERVISOR':
         return redirect('login_view')
         
-    weekly_log = get_object_or_404(WeeklyLog, id=log_id)
-    
-    if request.method == 'POST':
-        action = request.POST.get('action')
-        remarks = request.POST.get('supervisor_remarks', '').strip()
-        
-        weekly_log.supervisor_remarks = remarks
-        
-        if action == 'APPROVE':
-            weekly_log.status = 'APPROVED'
-            messages.success(request, f"Logbook week for {weekly_log.attachee.full_name} has been signed off successfully.")
-        elif action == 'REVISION':
-            weekly_log.status = 'REVISION'
-            messages.warning(request, f"Logbook sent back to {weekly_log.attachee.full_name} for revision updates.")
-        else:
-            messages.error(request, "Invalid action. Please use the provided Approve or Revision buttons.")
-            return redirect('review_logbook', log_id=log_id)
-            
-        weekly_log.save()
+    dept = request.user.department
+    if not dept:
+        messages.error(request, "You have not been assigned to a department.")
         return redirect('supervisor_dashboard')
         
+    weekly_log = get_object_or_404(WeeklyLog, id=log_id)
+    if weekly_log.attachee.department != dept:
+        messages.error(request, "Access Denied: This log belongs to an attachée in another department.")
+        return redirect('supervisor_dashboard')
+        
+    form_error = None
+
+    if request.method == 'POST':
+        action = request.POST.get('action', '').strip()
+        remarks = request.POST.get('supervisor_remarks', '').strip()
+
+        if action == 'APPROVE':
+            weekly_log.supervisor_remarks = remarks
+            weekly_log.status = 'APPROVED'
+            weekly_log.save()
+            messages.success(request, f"Logbook for {weekly_log.attachee.full_name} (week of {weekly_log.week_start_date}) signed off successfully.")
+            return redirect('supervisor_dashboard')
+        elif action == 'REVISION':
+            weekly_log.supervisor_remarks = remarks
+            weekly_log.status = 'REVISION'
+            weekly_log.save()
+            messages.warning(request, f"Logbook sent back to {weekly_log.attachee.full_name} for revision.")
+            return redirect('supervisor_dashboard')
+        else:
+            form_error = "Please click 'Digital Sign-Off / Approve' or 'Send Back for Revision'."
+
     context = {
         'weekly_log': weekly_log,
+        'form_error': form_error,
     }
     return render(request, 'core/review_logbook.html', context)
 
@@ -605,7 +617,16 @@ def evaluate_final_submission(request, assessment_id):
     if request.user.role != 'SUPERVISOR':
         return redirect('login_view')
         
+    dept = request.user.department
+    if not dept:
+        messages.error(request, "You have not been assigned to a department.")
+        return redirect('supervisor_dashboard')
+        
     assessment = get_object_or_404(FinalAssessment, id=assessment_id)
+    if assessment.attachee.department != dept:
+        messages.error(request, "Access Denied: This submission belongs to an attachée in another department.")
+        return redirect('supervisor_dashboard')
+        
     attachee_user = assessment.attachee.user  # Fetching the associated User object for the email address
     
     if request.method == 'POST':
@@ -675,7 +696,15 @@ def assign_and_reschedule_roster(request, attachee_id):
         messages.error(request, "Access Denied: Supervisor clearance required.")
         return redirect('supervisor_dashboard')
 
+    dept = request.user.department
+    if not dept:
+        messages.error(request, "You have not been assigned to a department.")
+        return redirect('supervisor_dashboard')
+
     attachee = get_object_or_404(AttacheeProfile, id=attachee_id)
+    if attachee.department != dept:
+        messages.error(request, "Access Denied: This attachée belongs to another department.")
+        return redirect('supervisor_dashboard')
     
     # Calculate target week commencing date (Standardized Monday)
     today = timezone.now().date()
@@ -789,40 +818,44 @@ def clear_all_shifts(request, attachee_id):
     messages.warning(request, f"Rotation matrix cleared and reset to total remote for {attachee.full_name}.")
     return redirect('assign_and_reschedule_roster', attachee_id=attachee.id)
 
+
 @login_required
 def bulk_assign_roster(request):
     """
     Allows supervisors to assign shift patterns to multiple attachées at once.
-    Filters attachees by department and excludes those already assigned for the week.
+    Scoped to the supervisor's own department only — no cross-department access.
     """
     if request.user.role != 'SUPERVISOR':
         messages.error(request, "Access Denied: Supervisor clearance required.")
         return redirect('supervisor_dashboard')
 
+    dept = request.user.department
+    if not dept:
+        messages.error(request, "You have not been assigned to a department yet.")
+        return redirect('supervisor_dashboard')
+
     today = timezone.now().date()
     today_str = today.strftime('%Y-%m-%d')
     current_monday = today - timedelta(days=today.weekday())
-    
-    departments = Department.objects.filter(is_verified=True)
-    selected_dept_id = request.GET.get('department')
-    
-    attachees = []
-    if selected_dept_id:
-        # Provide all attachees belonging to the chosen department
-        attachees = AttacheeProfile.objects.filter(
-            department_id=selected_dept_id, 
-            status__in=['APPROVED', 'ACTIVE']
-        ).distinct().order_by('full_name')
+
+    # Supervisor is locked to their own department — no department filter dropdown
+    selected_dept_id = str(dept.id)
+
+    # Load all active attachees in the supervisor's department
+    attachees = AttacheeProfile.objects.filter(
+        department=dept,
+        status__in=['APPROVED', 'ACTIVE']
+    ).distinct().order_by('full_name')
 
     if request.method == 'POST':
         attachee_ids = request.POST.getlist('attachee_ids')
         anchor_date_str = request.POST.get('anchor_date')
         anchor_date = datetime.datetime.strptime(anchor_date_str, '%Y-%m-%d').date()
         start_monday = anchor_date - timedelta(days=anchor_date.weekday())
-        
+
         physical_days = request.POST.getlist('physical_days')
         schedule_pattern = request.POST.get('schedule_pattern')
-        
+
         if not attachee_ids:
             messages.error(request, "Please select at least one attachée.")
         else:
@@ -832,20 +865,22 @@ def bulk_assign_roster(request):
                 physical_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 
             all_weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
-            
+
             with transaction.atomic():
                 for aid in attachee_ids:
                     profile = get_object_or_404(AttacheeProfile, id=aid)
-                    
-                    # Project for 12 weeks for each selected attachee
+                    # Security: Prevent cross-department tampering via form injection
+                    if profile.department != dept:
+                        messages.error(request, f"Access Denied: {profile.full_name} is not in your department.")
+                        return redirect('bulk_assign_roster')
+
                     for week_idx in range(12):
                         target_mon = start_monday + timedelta(weeks=week_idx)
                         ShiftAssignment.objects.filter(attachee=profile, week_start_date=target_mon).delete()
-                        
-                        all_weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+
                         for i, day in enumerate(all_weekdays):
                             current_date = target_mon + timedelta(days=i)
-                            
+
                             if current_date < anchor_date:
                                 mode = 'REMOTE'
                             else:
@@ -855,14 +890,12 @@ def bulk_assign_roster(request):
                                     mode = 'PHYSICAL'
                                 elif schedule_pattern.startswith('INTERVAL_'):
                                     gap = int(schedule_pattern.split('_')[1])
-                                    
                                     workdays_count = 0
                                     temp_date = anchor_date
                                     while temp_date < current_date:
                                         if temp_date.strftime('%A') not in ['Saturday', 'Sunday']:
                                             workdays_count += 1
                                         temp_date += timedelta(days=1)
-                                    
                                     mode = 'PHYSICAL' if workdays_count % (gap + 1) == 0 else 'REMOTE'
                                 else:
                                     mode = 'PHYSICAL' if day in physical_days else 'REMOTE'
@@ -873,12 +906,12 @@ def bulk_assign_roster(request):
                                 week_start_date=target_mon,
                                 work_mode=mode
                             )
-            
+
             messages.success(request, f"Batch rotations for {len(attachee_ids)} attachées projected for 12 weeks successfully.")
             return redirect('supervisor_dashboard')
 
     context = {
-        'departments': departments,
+        'department_name': dept.name,
         'attachees': attachees,
         'selected_dept_id': selected_dept_id,
         'current_monday': current_monday,
@@ -886,16 +919,26 @@ def bulk_assign_roster(request):
     }
     return render(request, 'core/bulk_assign_roster.html', context)
 
+
 @login_required
 def view_final_reports(request):
     if request.user.role != 'SUPERVISOR':
         return redirect('login_view')
-    
-    # Fetch all assessments that have an uploaded report
-    assessments = FinalAssessment.objects.filter(report_file__isnull=False).select_related('attachee')
-    
+
+    dept = request.user.department
+    if not dept:
+        messages.error(request, "You have not been assigned to a department yet.")
+        return redirect('supervisor_dashboard')
+
+    # Scope final reports to this supervisor's department only
+    assessments = FinalAssessment.objects.filter(
+        report_file__isnull=False,
+        attachee__department=dept
+    ).select_related('attachee')
+
     context = {
         'assessments': assessments,
+        'department_name': dept.name,
     }
     return render(request, 'core/view_final_reports.html', context)
 
@@ -904,11 +947,22 @@ def view_final_reports(request):
 def all_attachees_view(request):
     if request.user.role != 'SUPERVISOR':
         return redirect('login_view')
-    
-    # Fetch all attachees across all departments
-    attachees = AttacheeProfile.objects.all().select_related('department', 'user').order_by('full_name')
-    
+
+    dept = request.user.department
+    if not dept:
+        messages.error(request, "You have not been assigned to a department yet.")
+        return redirect('supervisor_dashboard')
+
+    # Fetch all attachees in this department with their weekly logs prefetched
+    from django.db.models import Prefetch
+    attachees = AttacheeProfile.objects.filter(
+        department=dept
+    ).select_related('department', 'user').prefetch_related(
+        Prefetch('weekly_logs', queryset=WeeklyLog.objects.order_by('-week_start_date'))
+    ).order_by('full_name')
+
     context = {
         'attachees': attachees,
+        'department_name': dept.name,
     }
     return render(request, 'core/all_attachees.html', context)

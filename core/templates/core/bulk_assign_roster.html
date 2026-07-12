@@ -15,20 +15,17 @@
             </div>
             <div class="card-body p-4 bg-white">
                 
-                <form method="GET" class="mb-4">
-                    <label class="form-label fw-bold small text-secondary">FILTER BY DEPARTMENT</label>
-                    <div class="input-group">
-                        <select name="department" class="form-select border-primary shadow-sm" onchange="this.form.submit()">
-                            <option value="">-- Choose Department to Load Attachées --</option>
-                            {% for dept in departments %}
-                                <option value="{{ dept.id }}" {% if selected_dept_id == dept.id|stringformat:"s" %}selected{% endif %}>{{ dept.name }}</option>
-                            {% endfor %}
-                        </select>
-                        <button class="btn btn-primary fw-bold px-4" type="submit">Load Directory</button>
+                <!-- Department Context Badge — Supervisor is locked to their department -->
+                <div class="alert alert-info d-flex align-items-center gap-3 mb-4 py-3 border-0 rounded-3 shadow-sm">
+                    <i class="bi bi-building-fill fs-4 text-primary"></i>
+                    <div>
+                        <div class="fw-bold text-dark">{{ department_name }} Department</div>
+                        <div class="small text-muted">Assigning batch rotation schedules for your department's attachées.</div>
                     </div>
-                </form>
+                </div>
 
                 {% if selected_dept_id %}
+
                 <form method="POST">
                     {% csrf_token %}
                     
