@@ -11,8 +11,10 @@
         const isOpening = !panel.classList.contains('active');
         if (isOpening) {
             panel.classList.add('active');
+            document.body.classList.add('acc-sidebar-open');
         } else {
             panel.classList.remove('active');
+            document.body.classList.remove('acc-sidebar-open');
         }
     };
 
@@ -156,4 +158,110 @@
         else if (cmd.includes('smaller')) changeFontSize(-20);
         else speak("I recognize your voice but that path is not mapped yet.");
     }
+
+    // ===== GEAR BUTTON SPIN ON CLICK =====
+    // Fires a fast spin animation each time the button is clicked
+    const _origToggle = window.toggleAccPanel;
+    window.toggleAccPanel = function() {
+        const btn = document.getElementById('accessibility-btn');
+        if (btn) {
+            btn.classList.add('spinning');
+            // After the fast spin animation ends (0.5s), restore idle spin
+            setTimeout(() => btn.classList.remove('spinning'), 520);
+        }
+        _origToggle();
+    };
+
+    // ===== PAGE LOAD, SPROUT & NAVIGATION INTERCEPTOR =====
+    document.addEventListener("DOMContentLoaded", function() {
+        const loader = document.getElementById('system-page-loader');
+
+        // Collect all sproutable elements — any direct children of main sections
+        function getSproutTargets() {
+            const selectors = [
+                'nav', 'header',
+                'main > *', '.container > *', '.container-fluid > *',
+                'section', 'article', '.card', '.row',
+                'form', 'table', 'footer'
+            ];
+            const seen = new Set();
+            const targets = [];
+            selectors.forEach(sel => {
+                document.querySelectorAll(sel).forEach(el => {
+                    // Skip the loader and accessibility elements themselves
+                    if (!el.closest('#system-page-loader') &&
+                        !el.closest('#accessibility-panel') &&
+                        !el.closest('#accessibility-widget') &&
+                        !seen.has(el)) {
+                        seen.add(el);
+                        targets.push(el);
+                    }
+                });
+            });
+            return targets;
+        }
+
+        // Phase 1: On DOMContentLoaded, immediately prep all sprout targets
+        const sproutTargets = getSproutTargets();
+        sproutTargets.forEach(el => {
+            el.classList.add('sprout-auto');
+        });
+
+        // Phase 2: After loader delay, hide loader then sprout content in waves
+        const LOADER_DURATION = 600; // ms — how long loader shows (keep spinner)
+        const SPROUT_DELAY   = 30;  // ms between each sprout wave (fast cascade)
+
+        setTimeout(() => {
+            // Fade out loader
+            if (loader) loader.classList.add('loaded');
+
+            // After loader finishes fading, stagger sprout the content
+            setTimeout(() => {
+                sproutTargets.forEach((el, i) => {
+                    setTimeout(() => {
+                        el.classList.add('sprouted');
+                    }, i * SPROUT_DELAY);
+                });
+            }, 80);
+        }, LOADER_DURATION);
+
+        // ===== NAVIGATION LINK INTERCEPTOR =====
+        document.addEventListener('click', function(e) {
+            const anchor = e.target.closest('a');
+            if (anchor) {
+                const href = anchor.getAttribute('href');
+                const target = anchor.getAttribute('target');
+                if (href &&
+                    !href.startsWith('#') &&
+                    !href.startsWith('javascript:') &&
+                    !e.defaultPrevented &&
+                    (!target || target === '_self') &&
+                    !anchor.classList.contains('no-transition') &&
+                    !anchor.hasAttribute('data-bs-toggle') &&
+                    !anchor.hasAttribute('data-toggle')) {
+
+                    e.preventDefault();
+                    // Show loader
+                    if (loader) loader.classList.remove('loaded');
+                    // Un-sprout everything for the "leaving" feel
+                    document.querySelectorAll('.sprouted').forEach(el => el.classList.remove('sprouted'));
+                    // Navigate after spinner has spun beautifully
+                    setTimeout(() => { window.location.href = href; }, 500);
+                }
+            }
+        });
+
+        // ===== FORM SUBMIT INTERCEPTOR =====
+        document.addEventListener('submit', function(e) {
+            const form = e.target;
+            if (form && !form.classList.contains('no-transition')) {
+                e.preventDefault();
+                if (loader) loader.classList.remove('loaded');
+                document.querySelectorAll('.sprouted').forEach(el => el.classList.remove('sprouted'));
+                setTimeout(() => { form.submit(); }, 500);
+            }
+        });
+    });
 })();
+
+

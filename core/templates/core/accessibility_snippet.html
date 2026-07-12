@@ -24,18 +24,58 @@
     }
 </style>
 
+<!-- Premium 7-Color Flaming Spinner Loader -->
+<div id="system-page-loader">
+    <div class="loader-container">
+        <span class="loader-text">ICT AUTHORITY</span>
+        <!-- Arc 1: Flame Red — fastest -->
+        <svg class="loader-arc arc-1" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="44" stroke="#FF1744" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="55 220" />
+        </svg>
+        <!-- Arc 2: Deep Orange -->
+        <svg class="loader-arc arc-2" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="38" stroke="#FF6D00" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="50 220" />
+        </svg>
+        <!-- Arc 3: Amber/Gold -->
+        <svg class="loader-arc arc-3" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="32" stroke="#FFD600" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="45 200" />
+        </svg>
+        <!-- Arc 4: Kenya Green -->
+        <svg class="loader-arc arc-4" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="44" stroke="#00C853" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="65 220" stroke-dashoffset="-70" />
+        </svg>
+        <!-- Arc 5: Electric Blue -->
+        <svg class="loader-arc arc-5" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="38" stroke="#00B0FF" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="40 200" stroke-dashoffset="-50" />
+        </svg>
+        <!-- Arc 6: Purple/Violet -->
+        <svg class="loader-arc arc-6" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="32" stroke="#AA00FF" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="35 200" stroke-dashoffset="-30" />
+        </svg>
+        <!-- Arc 7: White — slowest -->
+        <svg class="loader-arc arc-7" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="44" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="30 220" stroke-dashoffset="-140" />
+        </svg>
+    </div>
+</div>
+
 <div id="accessibility-widget">
-    <button id="accessibility-btn" onclick="toggleAccPanel()" title="Open Accessibility Desk">
-        <i class="bi bi-person-fill-check"></i>
+    <button id="accessibility-btn" onclick="toggleAccPanel()" title="Accessibility Settings">
+        <i class="bi bi-gear-fill" id="acc-gear-icon"></i>
     </button>
 </div>
 
 <div id="accessibility-panel">
-    <div class="acc-title mb-4">
-        <div class="bg-primary text-white p-2 rounded-3 me-2">
-            <i class="bi bi-universal-access"></i>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="acc-title m-0">
+            <div class="bg-primary text-white p-2 rounded-3 me-2" style="display:flex;align-items:center;justify-content:center;">
+                <i class="bi bi-universal-access fs-5"></i>
+            </div>
+            <span class="text-dark fw-bold">Accessibility</span>
         </div>
-        <span class="text-dark">Portal Accessibility</span>
+        <button onclick="toggleAccPanel()" class="btn-close-acc" title="Close Sidebar" id="acc-close-btn">
+            <i class="bi bi-x-lg"></i>
+        </button>
     </div>
 
     <!-- 1. Text Controls -->
@@ -139,8 +179,8 @@
             </div>
         </div>
 
-        <button class="btn btn-outline-danger btn-sm w-100 mt-4 fw-bold p-2 rounded-3 border-2" onclick="toggleAccPanel()">
-            <i class="bi bi-chevron-right"></i> Hide Sidebar
+        <button class="btn btn-outline-secondary btn-sm w-100 mt-4 fw-bold p-2 rounded-3 border-2" onclick="toggleAccPanel()">
+            <i class="bi bi-x-circle me-1"></i> Close Sidebar
         </button>
     </div>
 </div>
