@@ -209,7 +209,7 @@
 
         // Phase 2: After loader delay, hide loader then sprout content in waves
         const LOADER_DURATION = 600; // ms — how long loader shows (keep spinner)
-        const SPROUT_DELAY   = 30;  // ms between each sprout wave (fast cascade)
+        const SPROUT_DELAY   = 220;  // ms between each sprout wave (lovely slow motion)
 
         setTimeout(() => {
             // Fade out loader
@@ -222,7 +222,7 @@
                         el.classList.add('sprouted');
                     }, i * SPROUT_DELAY);
                 });
-            }, 80);
+            }, 150);
         }, LOADER_DURATION);
 
         // ===== NAVIGATION LINK INTERCEPTOR =====
