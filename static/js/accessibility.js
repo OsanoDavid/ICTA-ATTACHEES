@@ -3,10 +3,10 @@
  * Implements: Sidebar Push Layout & Multi-Color Visibility Themes
  */
 
-(function() {
+(function () {
     let currentFontSize = 100;
 
-    window.toggleAccPanel = function() {
+    window.toggleAccPanel = function () {
         const panel = document.getElementById('accessibility-panel');
         const isOpening = !panel.classList.contains('active');
         if (isOpening) {
@@ -18,15 +18,15 @@
         }
     };
 
-    window.toggleAccSetting = function(setting) {
+    window.toggleAccSetting = function (setting) {
         const body = document.body;
         if (setting === 'dyslexic') body.classList.toggle('acc-dyslexic');
     };
 
-    window.setTheme = function(theme) {
+    window.setTheme = function (theme) {
         const body = document.body;
         const themeClass = `theme-${theme}`;
-        
+
         if (theme !== 'default' && body.classList.contains(themeClass)) {
             body.classList.remove(themeClass);
             speak("Default theme restored");
@@ -41,7 +41,7 @@
         }
     };
 
-    window.changeFontSize = function(delta) {
+    window.changeFontSize = function (delta) {
         currentFontSize += delta;
         if (currentFontSize < 80) currentFontSize = 80;
         if (currentFontSize > 220) currentFontSize = 220;
@@ -53,10 +53,10 @@
 
     // Visual Display Modes — each mode has its OWN style tag so they stack independently
     const filterMap = {
-        dark:     'invert(1) hue-rotate(180deg)',
+        dark: 'invert(1) hue-rotate(180deg)',
         contrast: 'contrast(2.2) brightness(1.05)',
-        grayscale:'grayscale(1)',
-        sepia:    'sepia(0.85) brightness(1.05)'
+        grayscale: 'grayscale(1)',
+        sepia: 'sepia(0.85) brightness(1.05)'
     };
     const btnMap = {
         dark: 'btn-dark', contrast: 'btn-contrast',
@@ -64,7 +64,7 @@
     };
     const activeModes = {}; // track each mode independently
 
-    window.toggleDisplayMode = function(mode) {
+    window.toggleDisplayMode = function (mode) {
         const btn = document.getElementById(btnMap[mode]);
 
         if (activeModes[mode]) {
@@ -89,7 +89,7 @@
     function reapplyFilters() {
         const old = document.getElementById('acc-style-combined');
         if (old) old.remove();
-        
+
         const combined = buildCombinedFilter();
         if (!combined) return;
 
@@ -104,7 +104,7 @@
 
 
     // Font Family Switcher
-    window.changeFont = function(family) {
+    window.changeFont = function (family) {
         const old = document.getElementById('acc-font-style');
         if (old) old.remove();
         if (!family) return;
@@ -120,7 +120,7 @@
     const recognition = SpeechRecognition ? new SpeechRecognition() : null;
     const synth = window.speechSynthesis;
 
-    window.speak = function(text) {
+    window.speak = function (text) {
         if (!synth) return;
         synth.cancel();
         const utter = new SpeechSynthesisUtterance(text);
@@ -128,14 +128,14 @@
         synth.speak(utter);
     };
 
-    window.startVoiceAssistant = function() {
+    window.startVoiceAssistant = function () {
         if (!recognition) return;
         const overlay = document.getElementById('voice-overlay');
         overlay.style.display = 'flex';
         speak("Voice engine engaged. Command me.");
         recognition.start();
 
-        recognition.onresult = function(event) {
+        recognition.onresult = function (event) {
             const command = event.results[0][0].transcript.toLowerCase();
             setTimeout(() => {
                 processCommand(command);
@@ -162,7 +162,7 @@
     // ===== GEAR BUTTON SPIN ON CLICK =====
     // Fires a fast spin animation each time the button is clicked
     const _origToggle = window.toggleAccPanel;
-    window.toggleAccPanel = function() {
+    window.toggleAccPanel = function () {
         const btn = document.getElementById('accessibility-btn');
         if (btn) {
             btn.classList.add('spinning');
@@ -173,7 +173,7 @@
     };
 
     // ===== PAGE LOAD, SPROUT & NAVIGATION INTERCEPTOR =====
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         const loader = document.getElementById('system-page-loader');
 
         // Collect all sproutable elements — any direct children of main sections
@@ -209,7 +209,7 @@
 
         // Phase 2: After loader delay, hide loader then sprout content in waves
         const LOADER_DURATION = 350; // ms — loader hides faster so page loading starts sooner
-        const SPROUT_DELAY   = 160;  // ms between each sprout wave for a graceful stagger
+        const SPROUT_DELAY = 160;  // ms between each sprout wave for a graceful stagger
 
         setTimeout(() => {
             // Fade out loader
@@ -226,7 +226,7 @@
         }, LOADER_DURATION);
 
         // ===== NAVIGATION LINK INTERCEPTOR =====
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             const anchor = e.target.closest('a');
             if (anchor) {
                 const href = anchor.getAttribute('href');
@@ -252,7 +252,7 @@
         });
 
         // ===== FORM SUBMIT INTERCEPTOR =====
-        document.addEventListener('submit', function(e) {
+        document.addEventListener('submit', function (e) {
             const form = e.target;
             if (form && !form.classList.contains('no-transition')) {
                 e.preventDefault();

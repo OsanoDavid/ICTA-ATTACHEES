@@ -8,18 +8,34 @@
         border-radius: 50%;
         cursor: pointer;
         border: 2px solid white;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         transition: all 0.2s;
     }
-    .theme-circle:hover { transform: translateY(-3px); box-shadow: 0 5px 12px rgba(0,0,0,0.3); }
-    .tc-red { background: linear-gradient(to bottom, #f44336, #b71c1c); }
-    .tc-yellow { background: linear-gradient(to bottom, #ffeb3b, #fbc02d); }
-    .tc-blue { background: linear-gradient(to bottom, #2196f3, #0d47a1); }
-    .tc-default { background: #eeeeee; }
-    
+
+    .theme-circle:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .tc-red {
+        background: linear-gradient(to bottom, #f44336, #b71c1c);
+    }
+
+    .tc-yellow {
+        background: linear-gradient(to bottom, #ffeb3b, #fbc02d);
+    }
+
+    .tc-blue {
+        background: linear-gradient(to bottom, #2196f3, #0d47a1);
+    }
+
+    .tc-default {
+        background: #eeeeee;
+    }
+
     .acc-divider {
         height: 1px;
-        background: rgba(0,0,0,0.06);
+        background: rgba(0, 0, 0, 0.06);
         margin: 20px 0;
     }
 </style>
@@ -30,31 +46,38 @@
         <span class="loader-text">ICT AUTHORITY</span>
         <!-- Arc 1: Flame Red — fastest -->
         <svg class="loader-arc arc-1" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="44" stroke="#FF1744" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="55 220" />
+            <circle cx="50" cy="50" r="44" stroke="#FF1744" stroke-width="3" fill="none" stroke-linecap="round"
+                stroke-dasharray="55 220" />
         </svg>
         <!-- Arc 2: Deep Orange -->
         <svg class="loader-arc arc-2" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="38" stroke="#FF6D00" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="50 220" />
+            <circle cx="50" cy="50" r="38" stroke="#FF6D00" stroke-width="3" fill="none" stroke-linecap="round"
+                stroke-dasharray="50 220" />
         </svg>
         <!-- Arc 3: Amber/Gold -->
         <svg class="loader-arc arc-3" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="32" stroke="#FFD600" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="45 200" />
+            <circle cx="50" cy="50" r="32" stroke="#FFD600" stroke-width="3" fill="none" stroke-linecap="round"
+                stroke-dasharray="45 200" />
         </svg>
         <!-- Arc 4: Kenya Green -->
         <svg class="loader-arc arc-4" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="44" stroke="#00C853" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="65 220" stroke-dashoffset="-70" />
+            <circle cx="50" cy="50" r="44" stroke="#00C853" stroke-width="2.5" fill="none" stroke-linecap="round"
+                stroke-dasharray="65 220" stroke-dashoffset="-70" />
         </svg>
         <!-- Arc 5: Electric Blue -->
         <svg class="loader-arc arc-5" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="38" stroke="#00B0FF" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="40 200" stroke-dashoffset="-50" />
+            <circle cx="50" cy="50" r="38" stroke="#00B0FF" stroke-width="2.5" fill="none" stroke-linecap="round"
+                stroke-dasharray="40 200" stroke-dashoffset="-50" />
         </svg>
         <!-- Arc 6: Purple/Violet -->
         <svg class="loader-arc arc-6" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="32" stroke="#AA00FF" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="35 200" stroke-dashoffset="-30" />
+            <circle cx="50" cy="50" r="32" stroke="#AA00FF" stroke-width="2.5" fill="none" stroke-linecap="round"
+                stroke-dasharray="35 200" stroke-dashoffset="-30" />
         </svg>
         <!-- Arc 7: White — slowest -->
         <svg class="loader-arc arc-7" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="44" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="30 220" stroke-dashoffset="-140" />
+            <circle cx="50" cy="50" r="44" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round"
+                stroke-dasharray="30 220" stroke-dashoffset="-140" />
         </svg>
     </div>
 </div>
@@ -68,7 +91,8 @@
 <div id="accessibility-panel">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="acc-title m-0">
-            <div class="bg-primary text-white p-2 rounded-3 me-2" style="display:flex;align-items:center;justify-content:center;">
+            <div class="bg-primary text-white p-2 rounded-3 me-2"
+                style="display:flex;align-items:center;justify-content:center;">
                 <i class="bi bi-universal-access fs-5"></i>
             </div>
             <span class="text-dark fw-bold">Accessibility</span>
@@ -82,24 +106,20 @@
     <div class="acc-section">
         <span class="acc-label text-primary">Font Scaling</span>
         <div class="d-flex align-items-center gap-2">
-            <button onclick="changeFontSize(-15)"
-                style="flex:1; height:52px; font-size:1.8rem; font-weight:900;
+            <button onclick="changeFontSize(-15)" style="flex:1; height:52px; font-size:1.8rem; font-weight:900;
                        background:#dc3545; color:white; border:none; border-radius:12px;
                        cursor:pointer; box-shadow:0 3px 10px rgba(220,53,69,0.4);
-                       transition:transform 0.15s;"
-                onmousedown="this.style.transform='scale(0.93)'"
+                       transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.93)'"
                 onmouseup="this.style.transform='scale(1)'">&#8722;</button>
             <div style="text-align:center; min-width:68px;">
-                <div id="acc-font-display"
-                     style="font-size:1.3rem; font-weight:800; color:#0d6efd;">100%</div>
-                <div style="font-size:0.62rem; color:#999; letter-spacing:1px; text-transform:uppercase;">Font Size</div>
+                <div id="acc-font-display" style="font-size:1.3rem; font-weight:800; color:#0d6efd;">100%</div>
+                <div style="font-size:0.62rem; color:#999; letter-spacing:1px; text-transform:uppercase;">Font Size
+                </div>
             </div>
-            <button onclick="changeFontSize(15)"
-                style="flex:1; height:52px; font-size:1.8rem; font-weight:900;
+            <button onclick="changeFontSize(15)" style="flex:1; height:52px; font-size:1.8rem; font-weight:900;
                        background:#198754; color:white; border:none; border-radius:12px;
                        cursor:pointer; box-shadow:0 3px 10px rgba(25,135,84,0.4);
-                       transition:transform 0.15s;"
-                onmousedown="this.style.transform='scale(0.93)'"
+                       transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.93)'"
                 onmouseup="this.style.transform='scale(1)'">+</button>
         </div>
     </div>
@@ -109,7 +129,9 @@
     <!-- 2. Intelligence Section -->
     <div class="acc-section">
         <span class="acc-label text-primary">Voice-First Navigation</span>
-        <button class="btn btn-dark w-100 py-3 d-flex align-items-center justify-content-center gap-2 fw-bold shadow-sm rounded-3" onclick="startVoiceAssistant()">
+        <button
+            class="btn btn-dark w-100 py-3 d-flex align-items-center justify-content-center gap-2 fw-bold shadow-sm rounded-3"
+            onclick="startVoiceAssistant()">
             <i class="bi bi-mic-fill text-info"></i> Engage Voice Engine
         </button>
     </div>
@@ -179,7 +201,8 @@
             </div>
         </div>
 
-        <button class="btn btn-outline-secondary btn-sm w-100 mt-4 fw-bold p-2 rounded-3 border-2" onclick="toggleAccPanel()">
+        <button class="btn btn-outline-secondary btn-sm w-100 mt-4 fw-bold p-2 rounded-3 border-2"
+            onclick="toggleAccPanel()">
             <i class="bi bi-x-circle me-1"></i> Close Sidebar
         </button>
     </div>

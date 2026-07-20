@@ -63,6 +63,36 @@ def home_view(request):
 
 
 def login_view(request):
+    # Read which portal is being accessed via query param
+    portal = request.GET.get('portal', 'student')  # default: student
+
+    portal_config = {
+        'student': {
+            'title': 'Attachée Login',
+            'subtitle': 'ICT Authority — Student Portal',
+            'icon': 'bi-mortarboard-fill',
+            'color': '#0d6efd',
+            'bg': 'linear-gradient(135deg, #022a61 0%, #0c53a6 50%, #032a61 100%)',
+        },
+        'supervisor': {
+            'title': 'Supervisor Login',
+            'subtitle': 'ICT Authority — Supervisor Portal',
+            'icon': 'bi-person-badge-fill',
+            'color': '#10b981',
+            'bg': 'linear-gradient(135deg, #064e3b 0%, #059669 50%, #065f46 100%)',
+        },
+        'hr': {
+            'title': 'HR Desk Login',
+            'subtitle': 'ICT Authority — Human Resources',
+            'icon': 'bi-people-fill',
+            'color': '#a855f7',
+            'bg': 'linear-gradient(135deg, #3b0764 0%, #7e22ce 50%, #4c1d95 100%)',
+        },
+    }
+
+    ctx = portal_config.get(portal, portal_config['student'])
+    ctx['portal'] = portal
+
     if request.method == 'POST':
         user_in = request.POST.get('username')
         pass_in = request.POST.get('password')
@@ -77,7 +107,6 @@ def login_view(request):
 
         user = authenticate(request, username=username_to_auth, password=pass_in)
 
-        
         if user is not None:
             # Django superusers must always be able to access the Django admin,
             # even if their optional portal role was set incorrectly.
@@ -90,12 +119,12 @@ def login_view(request):
             if user.role == 'ATTACHEE':
                 try:
                     profile = AttacheeProfile.objects.get(user=user)
-                    if profile.status == 'PENDING':
-                        messages.error(request, 'Your application is pending supervisor verification. Please check back later.')
-                        return render(request, 'core/login.html')
+                    if profile.status in ['PENDING_HR', 'PENDING']:
+                        messages.error(request, 'Your application is pending verification. Please check back later.')
+                        return render(request, 'core/login.html', ctx)
                 except AttacheeProfile.DoesNotExist:
                     messages.error(request, 'No associate profiles are assigned to this account structure.')
-                    return render(request, 'core/login.html')
+                    return render(request, 'core/login.html', ctx)
 
             # Complete standard authentication process
             login(request, user)
@@ -105,6 +134,10 @@ def login_view(request):
                 messages.success(request, f"Welcome back, {user.username}! Supervisor login successful.")
                 return redirect('supervisor_dashboard')
                 
+            elif user.role == 'HR':
+                messages.success(request, f"Welcome back, {user.username}! HR Dashboard login successful.")
+                return redirect('hr_dashboard')
+                
             elif user.role == 'ATTACHEE':
                 messages.success(request, "Login successful! Welcome to your Attachée Dashboard.")
                 return redirect('attachee_dashboard')
@@ -112,7 +145,7 @@ def login_view(request):
         else:
             messages.error(request, 'Invalid username or password credentials.')
             
-    return render(request, 'core/login.html')
+    return render(request, 'core/login.html', ctx)
 
 
 def logout_view(request):
@@ -966,3 +999,361 @@ def all_attachees_view(request):
         'department_name': dept.name,
     }
     return render(request, 'core/all_attachees.html', context)
+
+
+# =========================================================================
+# HUMAN RESOURCES (HR) DASHBOARD & ACTIONS
+# =========================================================================
+
+@login_required
+def hr_dashboard(request):
+    if request.user.role != 'HR' and not request.user.is_superuser:
+        messages.error(request, "Access Denied: HR clearance required.")
+        return redirect('login_view')
+
+    # Calculate overall stats
+    total_attachees = AttacheeProfile.objects.count()
+    pending_hr_count = AttacheeProfile.objects.filter(status='PENDING_HR').count()
+    pending_supervisor_count = AttacheeProfile.objects.filter(status='PENDING').count()
+    active_count = AttacheeProfile.objects.filter(status='ACTIVE').count()
+    completed_count = AttacheeProfile.objects.filter(status='COMPLETED').count()
+    rejected_count = AttacheeProfile.objects.filter(status='REJECTED').count()
+
+    departments = Department.objects.filter(is_verified=True).order_by('name')
+    pending_profiles = AttacheeProfile.objects.filter(status='PENDING_HR').select_related('department')
+
+    # Build filtered search for placement database
+    from django.db.models import Q
+    q = request.GET.get('q', '').strip()
+    selected_dept = request.GET.get('department', '')
+    selected_status = request.GET.get('status', '')
+
+    all_profiles = AttacheeProfile.objects.select_related('department', 'user')
+
+    if q:
+        all_profiles = all_profiles.filter(
+            Q(full_name__icontains=q) | 
+            Q(registration_number__icontains=q) | 
+            Q(institution__icontains=q) |
+            Q(course_name__icontains=q)
+        )
+    if selected_dept:
+        all_profiles = all_profiles.filter(department_id=selected_dept)
+    if selected_status:
+        all_profiles = all_profiles.filter(status=selected_status)
+
+    all_profiles = all_profiles.order_by('-created_at')
+
+    # Compute progress bars and attach to each profile
+    today = timezone.now().date()
+    for profile in all_profiles:
+        profile.progress_percent = 0
+        if profile.attachment_start_date and profile.attachment_end_date:
+            total_days = (profile.attachment_end_date - profile.attachment_start_date).days
+            elapsed_days = (today - profile.attachment_start_date).days
+            if elapsed_days < 0:
+                profile.progress_percent = 0
+            elif elapsed_days > total_days:
+                profile.progress_percent = 100
+            else:
+                profile.progress_percent = int((elapsed_days / total_days) * 100) if total_days > 0 else 0
+
+    context = {
+        'total_attachees': total_attachees,
+        'pending_hr_count': pending_hr_count,
+        'pending_supervisor_count': pending_supervisor_count,
+        'active_count': active_count,
+        'completed_count': completed_count,
+        'rejected_count': rejected_count,
+        'departments': departments,
+        'pending_profiles': pending_profiles,
+        'all_profiles': all_profiles,
+        'q': q,
+        'selected_dept': selected_dept,
+        'selected_status': selected_status,
+    }
+    return render(request, 'core/hr_dashboard.html', context)
+
+
+@login_required
+def hr_approve_attachee(request, profile_id):
+    if request.user.role != 'HR' and not request.user.is_superuser:
+        messages.error(request, "Access Denied: HR clearance required.")
+        return redirect('login_view')
+
+    profile = get_object_or_404(AttacheeProfile, id=profile_id)
+
+    if request.method == 'POST':
+        # HR can confirm or re-assign department as part of placement matching
+        dept_id = request.POST.get('department')
+        if dept_id:
+            dept = get_object_or_404(Department, id=dept_id)
+            profile.department = dept
+        
+        # Optionally allow HR to confirm start/end dates
+        start_date = request.POST.get('attachment_start_date')
+        end_date = request.POST.get('attachment_end_date')
+        if start_date:
+            try:
+                profile.attachment_start_date = datetime.date.fromisoformat(start_date)
+            except ValueError:
+                pass
+        if end_date:
+            try:
+                profile.attachment_end_date = datetime.date.fromisoformat(end_date)
+            except ValueError:
+                pass
+        
+        profile.status = 'PENDING'  # Move to Supervisor approval stage
+        profile.save()
+        messages.success(
+            request, 
+            f"Attachée {profile.full_name} has been verified by HR and successfully placed in the {profile.department.name} department. Pending Supervisor Approval."
+        )
+
+    return redirect('hr_dashboard')
+
+
+@login_required
+def hr_reject_attachee(request, profile_id):
+    if request.user.role != 'HR' and not request.user.is_superuser:
+        messages.error(request, "Access Denied: HR clearance required.")
+        return redirect('login_view')
+
+    profile = get_object_or_404(AttacheeProfile, id=profile_id)
+    profile.status = 'REJECTED'
+    profile.save()
+    messages.warning(request, f"Attachée application for {profile.full_name} has been rejected by HR.")
+    return redirect('hr_dashboard')
+
+
+@login_required
+def hr_add_attachee(request):
+    if request.user.role != 'HR' and not request.user.is_superuser:
+        messages.error(request, "Access Denied: HR clearance required.")
+        return redirect('login_view')
+        
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        full_name = request.POST.get('full_name')
+        gender = request.POST.get('gender')
+        registration_number = request.POST.get('registration_number')
+        national_id = request.POST.get('national_id')
+        course_name = request.POST.get('course_name')
+        institution = request.POST.get('institution')
+        dept_id = request.POST.get('department')
+        start_date = request.POST.get('attachment_start_date')
+        end_date = request.POST.get('attachment_end_date')
+        
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "A user with this username already exists.")
+            return redirect('hr_dashboard')
+            
+        if AttacheeProfile.objects.filter(registration_number=registration_number).exists():
+            messages.error(request, "An attachée with this registration number already exists.")
+            return redirect('hr_dashboard')
+            
+        with transaction.atomic():
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                role='ATTACHEE'
+            )
+            dept = get_object_or_404(Department, id=dept_id)
+            profile = AttacheeProfile.objects.create(
+                user=user,
+                full_name=full_name,
+                gender=gender,
+                registration_number=registration_number,
+                national_id=national_id,
+                course_name=course_name,
+                institution=institution,
+                department=dept,
+                attachment_start_date=datetime.date.fromisoformat(start_date) if start_date else None,
+                attachment_end_date=datetime.date.fromisoformat(end_date) if end_date else None,
+                status='PENDING'  # Bypasses HR stage since HR registered them, straight to supervisor
+            )
+            messages.success(request, f"Attachée {full_name} has been successfully added directly. Awaiting supervisor approval.")
+            
+    return redirect('hr_dashboard')
+
+
+@login_required
+def hr_add_supervisor(request):
+    if request.user.role != 'HR' and not request.user.is_superuser:
+        messages.error(request, "Access Denied: HR clearance required.")
+        return redirect('login_view')
+        
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        dept_id = request.POST.get('department')
+        
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "A user with this username already exists.")
+            return redirect('hr_dashboard')
+            
+        with transaction.atomic():
+            dept = get_object_or_404(Department, id=dept_id)
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                role='SUPERVISOR',
+                is_staff=True,
+                department=dept
+            )
+            messages.success(request, f"Supervisor {first_name} {last_name} has been successfully added for {dept.name} department.")
+            
+    return redirect('hr_dashboard')
+
+
+@login_required
+def hr_edit_attachee(request, profile_id):
+    if request.user.role != 'HR' and not request.user.is_superuser:
+        messages.error(request, "Access Denied: HR clearance required.")
+        return redirect('login_view')
+        
+    profile = get_object_or_404(AttacheeProfile, id=profile_id)
+    
+    if request.method == 'POST':
+        profile.full_name = request.POST.get('full_name', profile.full_name)
+        profile.registration_number = request.POST.get('registration_number', profile.registration_number)
+        profile.national_id = request.POST.get('national_id', profile.national_id)
+        profile.course_name = request.POST.get('course_name', profile.course_name)
+        profile.institution = request.POST.get('institution', profile.institution)
+        
+        dept_id = request.POST.get('department')
+        if dept_id:
+            profile.department = get_object_or_404(Department, id=dept_id)
+            
+        start_date = request.POST.get('attachment_start_date')
+        if start_date:
+            try:
+                profile.attachment_start_date = datetime.date.fromisoformat(start_date)
+            except ValueError:
+                messages.error(request, "Invalid start date format. Use YYYY-MM-DD.")
+                return redirect('hr_dashboard')
+        end_date = request.POST.get('attachment_end_date')
+        if end_date:
+            try:
+                profile.attachment_end_date = datetime.date.fromisoformat(end_date)
+            except ValueError:
+                messages.error(request, "Invalid end date format. Use YYYY-MM-DD.")
+                return redirect('hr_dashboard')
+            
+        profile.save()
+        messages.success(request, f"Profile details for {profile.full_name} have been updated successfully.")
+        
+    return redirect('hr_dashboard')
+
+
+@login_required
+def hr_delete_attachee(request, profile_id):
+    if request.user.role != 'HR' and not request.user.is_superuser:
+        messages.error(request, "Access Denied: HR clearance required.")
+        return redirect('login_view')
+        
+    profile = get_object_or_404(AttacheeProfile, id=profile_id)
+    user = profile.user
+    name = profile.full_name
+    
+    with transaction.atomic():
+        profile.delete()
+        user.delete()
+        
+    messages.warning(request, f"Attachée {name} and their user account have been deleted from the system.")
+    return redirect('hr_dashboard')
+
+
+@login_required
+def hr_issue_certificate(request, profile_id):
+    if request.user.role != 'HR' and not request.user.is_superuser:
+        messages.error(request, "Access Denied: HR clearance required.")
+        return redirect('login_view')
+        
+    profile = get_object_or_404(AttacheeProfile, id=profile_id)
+    profile.certificate_approved = True
+    profile.status = 'COMPLETED'
+    profile.save()
+    
+    messages.success(request, f"Certificate has been officially issued for {profile.full_name}. It is now available in their portal.")
+    return redirect('hr_dashboard')
+
+
+@login_required
+def attachee_certificate(request):
+    profile = None
+    if request.user.role == 'ATTACHEE':
+        profile = getattr(request.user, 'attachee_profile', None)
+    elif request.user.role == 'HR' or request.user.is_superuser or request.user.role == 'SUPERVISOR':
+        profile_id = request.GET.get('profile_id')
+        if profile_id:
+            profile = get_object_or_404(AttacheeProfile, id=profile_id)
+            
+    if not profile:
+        messages.error(request, "No profile was found.")
+        return redirect('login_view')
+        
+    if not profile.certificate_approved:
+        messages.error(request, "Your completion certificate has not been approved/issued yet. Please contact HR.")
+        return redirect('attachee_dashboard')
+        
+    context = {
+        'profile': profile,
+        'today': timezone.now().date(),
+    }
+    return render(request, 'core/certificate.html', context)
+
+
+@login_required
+def certificate_pdf(request):
+    """Generate and download the certificate as a PDF file."""
+    from io import BytesIO
+    from xhtml2pdf import pisa
+    from django.template.loader import render_to_string
+    from django.http import HttpResponse
+
+    profile = None
+    if request.user.role == 'ATTACHEE':
+        profile = getattr(request.user, 'attachee_profile', None)
+    elif request.user.role in ['HR', 'SUPERVISOR'] or request.user.is_superuser:
+        profile_id = request.GET.get('profile_id')
+        if profile_id:
+            profile = get_object_or_404(AttacheeProfile, id=profile_id)
+
+    if not profile:
+        messages.error(request, "No profile was found.")
+        return redirect('login_view')
+
+    if not profile.certificate_approved:
+        messages.error(request, "Certificate has not been approved/issued yet.")
+        return redirect('attachee_dashboard')
+
+    context = {
+        'profile': profile,
+        'today': timezone.now().date(),
+        'pdf_mode': True,  # hides print controls in template
+    }
+
+    html_string = render_to_string('core/certificate.html', context, request=request)
+    buffer = BytesIO()
+    pisa_status = pisa.CreatePDF(html_string, dest=buffer)
+
+    if pisa_status.err:
+        messages.error(request, "Failed to generate PDF. Please try again.")
+        return redirect('attachee_certificate')
+
+    buffer.seek(0)
+    filename = f"ICTA_Certificate_{profile.registration_number}.pdf"
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return response

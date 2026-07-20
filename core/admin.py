@@ -15,20 +15,20 @@ from .models import (
 
 class StaffUserFilter(admin.SimpleListFilter):
     """
-    Custom filter to separate Staff (Admin/Supervisor) from Attachees.
+    Custom filter to separate Staff (Admin/Supervisor/HR) from Attachees.
     """
     title = 'User Category'
     parameter_name = 'user_category'
 
     def lookups(self, request, model_admin):
         return [
-            ('staff', '🔐 Staff (Admins & Supervisors)'),
+            ('staff', '🔐 Staff (Admins, Supervisors, HR)'),
             ('attachees', '🎓 Attachées'),
         ]
 
     def queryset(self, request, queryset):
         if self.value() == 'staff':
-            return queryset.filter(role__in=['ADMIN', 'SUPERVISOR'])
+            return queryset.filter(role__in=['ADMIN', 'SUPERVISOR', 'HR'])
         if self.value() == 'attachees':
             return queryset.filter(role='ATTACHEE')
         return queryset
@@ -53,6 +53,7 @@ class CustomUserAdmin(UserAdmin):
         icons = {
             'ADMIN': '🔴',
             'SUPERVISOR': '🔵',
+            'HR': '🟣',
             'ATTACHEE': '🟢',
         }
         icon = icons.get(obj.role, '⚪')
@@ -65,7 +66,7 @@ class CustomUserAdmin(UserAdmin):
 
     def get_category_label(self, obj):
         """Show whether this is a Staff member or Attachee."""
-        if obj.role in ['ADMIN', 'SUPERVISOR']:
+        if obj.role in ['ADMIN', 'SUPERVISOR', 'HR']:
             return mark_safe(
                 '<span style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;'
                 'font-weight:700;font-size:11px;padding:4px 10px;border-radius:20px;'
@@ -89,11 +90,13 @@ class CustomUserAdmin(UserAdmin):
         role_styles = {
             'ADMIN': 'background:linear-gradient(135deg,#7f1d1d,#dc2626);color:#fff;box-shadow:0 2px 6px rgba(220,38,38,0.5);',
             'SUPERVISOR': 'background:linear-gradient(135deg,#1e3a6b,#2563eb);color:#fff;box-shadow:0 2px 6px rgba(37,99,235,0.5);',
+            'HR': 'background:linear-gradient(135deg,#5b21b6,#7c3aed);color:#fff;box-shadow:0 2px 6px rgba(124,58,237,0.5);',
             'ATTACHEE': 'background:linear-gradient(135deg,#0f4c4c,#0d9488);color:#fff;box-shadow:0 2px 6px rgba(13,148,136,0.5);',
         }
         role_labels = {
             'ADMIN': '🔴 Administrator',
             'SUPERVISOR': '🔵 Supervisor',
+            'HR': '🟣 HR Officer',
             'ATTACHEE': '🟢 Attachée',
         }
         style = role_styles.get(obj.role.upper(), 'background:#6b7280;color:#fff;')

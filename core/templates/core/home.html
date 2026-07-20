@@ -328,8 +328,14 @@
                     <h6>Quick Navigation</h6>
                     <a href="#"><i class="fa-solid fa-chevron-right me-2 small" style="color:#0055b3;"></i>Back to
                         Top</a>
-                    <a href="{% url 'login_view' %}"><i class="fa-solid fa-chevron-right me-2 small"
-                            style="color:#0055b3;"></i>Portal Login</a>
+                    <a href="{% url 'login_view' %}?portal=student"><i class="fa-solid fa-chevron-right me-2 small"
+                            style="color:#0055b3;"></i>Attachée Portal Login</a>
+                    <a href="{% url 'login_view' %}?portal=supervisor"><i class="fa-solid fa-chevron-right me-2 small"
+                            style="color:#0055b3;"></i>Supervisor Portal Login</a>
+                    <a href="{% url 'login_view' %}?portal=hr"><i class="fa-solid fa-chevron-right me-2 small"
+                            style="color:#0055b3;"></i>HR Desk Login</a>
+                    <a href="/admin/"><i class="fa-solid fa-chevron-right me-2 small"
+                            style="color:#0055b3;"></i>System Manager</a>
                     <a href="{% url 'register_view' %}"><i class="fa-solid fa-chevron-right me-2 small"
                             style="color:#0055b3;"></i>Register Profile</a>
                     <a href="#metrics"><i class="fa-solid fa-chevron-right me-2 small"

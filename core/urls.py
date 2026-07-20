@@ -27,6 +27,18 @@ urlpatterns = [
     path('all-attachees/', views.all_attachees_view, name='all_attachees'),
     path('change-password/', views.change_password_view, name='change_password'),
 
+    # HR Dashboard & Actions
+    path('hr/', views.hr_dashboard, name='hr_dashboard'),
+    path('hr/approve/<int:profile_id>/', views.hr_approve_attachee, name='hr_approve_attachee'),
+    path('hr/reject/<int:profile_id>/', views.hr_reject_attachee, name='hr_reject_attachee'),
+    path('hr/add-attachee/', views.hr_add_attachee, name='hr_add_attachee'),
+    path('hr/add-supervisor/', views.hr_add_supervisor, name='hr_add_supervisor'),
+    path('hr/edit-attachee/<int:profile_id>/', views.hr_edit_attachee, name='hr_edit_attachee'),
+    path('hr/delete-attachee/<int:profile_id>/', views.hr_delete_attachee, name='hr_delete_attachee'),
+    path('hr/issue-certificate/<int:profile_id>/', views.hr_issue_certificate, name='hr_issue_certificate'),
+    path('attachee/certificate/', views.attachee_certificate, name='attachee_certificate'),
+    path('attachee/certificate/pdf/', views.certificate_pdf, name='certificate_pdf'),
+
     # Roster Management
     path('roster/trigger/', views.trigger_roster_engine, name='trigger_roster_engine'),
     path('roster/assign/<int:attachee_id>/', views.assign_and_reschedule_roster, name='assign_and_reschedule_roster'),

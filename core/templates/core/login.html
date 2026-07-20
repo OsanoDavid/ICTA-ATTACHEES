@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ICTA Portal - Login</title>
+    <title>ICTA Portal — {% if title %}{{ title }}{% else %}Login{% endif %}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
@@ -24,7 +24,7 @@
 
         /* Exact linear gradient top panel matching image_fedba5.jpg */
         .portal-top-panel {
-            background: linear-gradient(135deg, #022a61 0%, #0c53a6 50%, #032a61 100%);
+            background: {{ bg|default:'linear-gradient(135deg, #022a61 0%, #0c53a6 50%, #032a61 100%)' }};
             padding: 25px 24px;
             position: relative;
         }
@@ -121,8 +121,8 @@
                     <img src="/static/images/logo1.png" alt="Ministry & ICT Authority Logo" class="brand-logo-img">
                 </div>
                 <div class="header-titles">
-                    <h1 class="header-main-title">Attachée Login</h1>
-                    <p class="header-sub-title">ICT Authority — Portal Enrolment</p>
+                    <h1 class="header-main-title">{{ title|default:'Attachée Login' }}</h1>
+                    <p class="header-sub-title">{{ subtitle|default:'ICT Authority — Portal Enrolment' }}</p>
                 </div>
             </div>
         </div>
@@ -166,14 +166,16 @@
                     </div>
                 </div>
                 
-                <button type="submit" id="submitBtn" class="btn btn-primary w-100 mt-4 fw-bold d-flex align-items-center justify-content-center gap-2 py-2.5 shadow-sm" style="background-color: #0d6efd; border: none; border-radius: 8px;">
-                    <span id="btnText">Sign In</span>
+                <button type="submit" id="submitBtn" class="btn btn-primary w-100 mt-4 fw-bold d-flex align-items-center justify-content-center gap-2 py-2.5 shadow-sm" style="background-color: {{ color|default:'#0d6efd' }}; border: none; border-radius: 8px;">
+                    <span id="btnText"><i class="bi {{ icon|default:'bi-box-arrow-in-right' }} me-1"></i> Sign In</span>
                     <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                 </button>
                 
+                {% if portal == 'student' or not portal %}
                 <div class="text-center mt-3 mb-1 d-flex flex-column gap-1">
                     <a href="{% url 'register_view' %}" class="text-decoration-none text-muted small">New Attachée? Register here</a>
                 </div>
+                {% endif %}
             </form>
         </div>
     </div>

@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate of Completion - {{ profile.full_name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Great+Vibes&family=Playfair+Display:wght@400;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: #d1d5db;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 30px 20px 60px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* ── Print Controls ── */
+        .print-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .btn-ctrl {
+            background: #1e293b;
+            color: #fff;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: background 0.2s;
+        }
+        .btn-ctrl:hover { background: #334155; }
+        .btn-ctrl.btn-back { background: #fff; color: #1e293b; border: 1px solid #cbd5e1; }
+        .btn-ctrl.btn-back:hover { background: #f8fafc; }
+
+        /* ── Certificate Wrapper ── */
+        .cert-page {
+            width: 960px;
+            background: #fffef5;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ── TOP BORDER ── Red/White mosaic pattern */
+        .border-top-strip, .border-bottom-strip {
+            width: 100%;
+            height: 55px;
+            background: #cc0000;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mosaic-pattern {
+            width: 100%;
+            height: 100%;
+            background-image: repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(255,255,255,0.3) 10px,
+                    rgba(255,255,255,0.3) 20px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(255,255,255,0.3) 10px,
+                    rgba(255,255,255,0.3) 20px
+                );
+        }
+
+        /* Meander / Greek Key SVG-like strips */
+        .border-top-strip::before,
+        .border-bottom-strip::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                repeating-linear-gradient(90deg,
+                    rgba(255,255,255,0.15) 0px, rgba(255,255,255,0.15) 8px,
+                    transparent 8px, transparent 16px
+                ),
+                repeating-linear-gradient(0deg,
+                    rgba(255,255,255,0.15) 0px, rgba(255,255,255,0.15) 8px,
+                    transparent 8px, transparent 16px
+                );
+        }
+
+        /* ── SIDE BARS: Kenya Flag Colors ── */
+        .sidebar-left, .sidebar-right {
+            position: absolute;
+            top: 55px;
+            bottom: 55px;
+            width: 22px;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-left { left: 0; }
+        .sidebar-right { right: 0; }
+
+        .bar-red { flex: 1; background: #bb0000; }
+        .bar-black { flex: 1; background: #1a1a1a; }
+        .bar-green { flex: 1; background: #006600; }
+
+        /* ── CIRCUIT BOARD BACKGROUND WATERMARK ── */
+        .circuit-watermark {
+            position: absolute;
+            top: 55px;
+            left: 22px;
+            right: 22px;
+            bottom: 55px;
+            opacity: 0.06;
+            pointer-events: none;
+            background-image:
+                linear-gradient(#cc0000 1px, transparent 1px),
+                linear-gradient(90deg, #cc0000 1px, transparent 1px),
+                radial-gradient(circle at 30% 40%, #cc0000 2px, transparent 2px),
+                radial-gradient(circle at 70% 60%, #cc0000 2px, transparent 2px),
+                radial-gradient(circle at 50% 25%, #cc0000 2px, transparent 2px),
+                radial-gradient(circle at 20% 70%, #cc0000 2px, transparent 2px),
+                radial-gradient(circle at 80% 30%, #cc0000 2px, transparent 2px);
+            background-size:
+                50px 50px,
+                50px 50px,
+                150px 150px,
+                200px 200px,
+                250px 250px,
+                180px 180px,
+                120px 120px;
+        }
+
+        /* Center ICT Authority watermark logo text */
+        .center-watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5rem;
+            font-weight: 800;
+            color: #cc0000;
+            opacity: 0.04;
+            white-space: nowrap;
+            pointer-events: none;
+            letter-spacing: 10px;
+        }
+
+        /* ── MAIN CONTENT AREA ── */
+        .cert-body {
+            padding: 40px 70px 45px;
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        /* ── DUAL LOGOS HEADER ── */
+        .logos-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 55px;
+            margin-bottom: 20px;
+        }
+
+        .logo-ministry {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-ministry img {
+            height: 58px;
+        }
+
+        .ministry-text {
+            font-size: 0.68rem;
+            line-height: 1.4;
+            font-weight: 600;
+            color: #1e293b;
+            text-align: left;
+            max-width: 130px;
+        }
+
+        .logo-icta {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .icta-icon {
+            width: 45px;
+            height: 45px;
+        }
+
+        .icta-text {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: #cc0000;
+            font-style: italic;
+            line-height: 1;
+        }
+
+        .icta-sub {
+            font-size: 0.85rem;
+            color: #374151;
+            font-weight: 600;
+            margin-top: -2px;
+        }
+
+        /* ── CERTIFICATE TITLE ── */
+        .cert-title {
+            font-family: 'MedievalSharp', 'Playfair Display', serif;
+            font-size: 3rem;
+            color: #cc0000;
+            margin: 5px 0 20px;
+            letter-spacing: 1px;
+        }
+
+        /* ── AWARDED TO SECTION ── */
+        .awarded-to-label {
+            font-size: 1.1rem;
+            color: #374151;
+            margin-bottom: 5px;
+            font-style: italic;
+        }
+
+        .recipient-name {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3.6rem;
+            color: #15803d;
+            line-height: 1.15;
+            margin: 2px 0 6px;
+        }
+
+        .name-underlines {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 22px;
+        }
+
+        .name-underlines span {
+            height: 1.5px;
+            background: #9ca3af;
+        }
+
+        .name-line-long { width: 220px; }
+        .name-line-mid { width: 80px; }
+
+        /* ── BODY TEXT ── */
+        .body-text {
+            font-size: 1.05rem;
+            color: #374151;
+            line-height: 1.8;
+            margin-bottom: 5px;
+        }
+
+        .program-title-box {
+            display: inline-block;
+            margin: 8px 0 8px;
+            padding: 0 40px;
+        }
+
+        .program-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1e293b;
+            text-align: center;
+            border-top: 1px solid #94a3b8;
+            border-bottom: 1px solid #94a3b8;
+            padding: 6px 30px;
+            letter-spacing: 0.5px;
+        }
+
+        .conducted-line {
+            font-size: 1.0rem;
+            color: #374151;
+            margin: 10px 0 18px;
+        }
+
+        .highlight-bold {
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        /* ── DATE SECTION ── */
+        .on-this-date-label {
+            font-size: 1rem;
+            color: #374151;
+            font-style: italic;
+            margin-bottom: 4px;
+        }
+
+        .date-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+            border-top: 1px solid #cbd5e1;
+            border-bottom: 1px solid #cbd5e1;
+            padding: 5px 0;
+            display: inline-block;
+            min-width: 200px;
+            margin-bottom: 16px;
+        }
+
+        .cert-id {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 24px;
+        }
+
+        /* ── FOOTER: SIGNATURE + QR ── */
+        .cert-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 12px;
+        }
+
+        .signature-block {
+            text-align: center;
+        }
+
+        .signature-img {
+            height: 55px;
+            margin-bottom: 2px;
+            filter: brightness(0);
+        }
+
+        .signature-line {
+            width: 200px;
+            height: 1px;
+            background: #64748b;
+            margin: 4px auto 8px;
+        }
+
+        .sig-role {
+            font-size: 0.8rem;
+            color: #374151;
+            margin-bottom: 2px;
+        }
+
+        .sig-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .sig-org {
+            font-size: 0.8rem;
+            color: #374151;
+            font-style: italic;
+        }
+
+        /* QR block */
+        .qr-block {
+            text-align: center;
+        }
+
+        .qr-code-img {
+            width: 90px;
+            height: 90px;
+            border: 2px solid #e2e8f0;
+            padding: 5px;
+            background: white;
+            display: block;
+            margin: 0 auto 6px;
+        }
+
+        .qr-label {
+            font-size: 0.72rem;
+            color: #64748b;
+        }
+
+        /* ── PRINT STYLES ── */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            .print-controls { display: none !important; }
+            .cert-page {
+                box-shadow: none;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+{% if not pdf_mode %}
+<!-- Print Action Buttons -->
+<div class="print-controls">
+    <a href="javascript:history.back()" class="btn-ctrl btn-back">&#8592; Go Back</a>
+    <a href="{% url 'certificate_pdf' %}{% if request.GET.profile_id %}?profile_id={{ request.GET.profile_id }}{% endif %}" class="btn-ctrl" style="background:#15803d;">
+        &#128229; Download PDF
+    </a>
+    <button class="btn-ctrl" onclick="window.print()">&#128424;&#65039; Print</button>
+</div>
+{% endif %}
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- CERTIFICATE PAGE                                 -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="cert-page">
+
+    <!-- TOP MOSAIC BORDER -->
+    <div class="border-top-strip"><div class="mosaic-pattern"></div></div>
+
+    <!-- KENYA FLAG SIDE BARS -->
+    <div class="sidebar-left">
+        <div class="bar-red"></div>
+        <div class="bar-black"></div>
+        <div class="bar-green"></div>
+    </div>
+    <div class="sidebar-right">
+        <div class="bar-red"></div>
+        <div class="bar-black"></div>
+        <div class="bar-green"></div>
+    </div>
+
+    <!-- CIRCUIT BOARD WATERMARK -->
+    <div class="circuit-watermark"></div>
+
+    <!-- CENTER ICT TEXT WATERMARK -->
+    <div class="center-watermark">ICT</div>
+
+    <!-- MAIN CERTIFICATE CONTENT -->
+    <div class="cert-body">
+
+        <!-- DUAL LOGOS ROW -->
+        <div class="logos-row">
+            <!-- Ministry of ICT -->
+            <div class="logo-ministry">
+                <img src="/static/images/logo1.png" alt="Government Coat of Arms" onerror="this.style.display='none'">
+                <div class="ministry-text">
+                    Ministry of Information,<br>
+                    Communications &amp;<br>
+                    The Digital Economy
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div style="width: 1px; height: 50px; background: #cbd5e1;"></div>
+
+            <!-- ICT Authority -->
+            <div class="logo-icta">
+                <!-- ICT Authority Icon SVG -->
+                <svg class="icta-icon" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="40" cy="40" r="38" fill="none" stroke="#cc0000" stroke-width="4"/>
+                    <circle cx="40" cy="40" r="26" fill="none" stroke="#cc0000" stroke-width="2.5"/>
+                    <line x1="40" y1="2" x2="40" y2="20" stroke="#cc0000" stroke-width="3"/>
+                    <line x1="40" y1="60" x2="40" y2="78" stroke="#cc0000" stroke-width="3"/>
+                    <line x1="2" y1="40" x2="20" y2="40" stroke="#cc0000" stroke-width="3"/>
+                    <line x1="60" y1="40" x2="78" y2="40" stroke="#cc0000" stroke-width="3"/>
+                    <circle cx="40" cy="40" r="6" fill="#cc0000"/>
+                </svg>
+                <div>
+                    <div style="display:flex; align-items:baseline; gap:4px;">
+                        <span class="icta-text">ICT</span>
+                    </div>
+                    <div class="icta-sub">Authority</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TITLE -->
+        <div class="cert-title">Certificate of Completion</div>
+
+        <!-- AWARDED TO -->
+        <div class="awarded-to-label">Awarded to</div>
+
+        <div class="recipient-name">{{ profile.full_name }}</div>
+
+        <div class="name-underlines">
+            <span class="name-line-mid"></span>
+            <span class="name-line-long"></span>
+            <span class="name-line-mid"></span>
+        </div>
+
+        <!-- BODY TEXT -->
+        <p class="body-text">In recognition of successfully completing</p>
+
+        <div class="program-title-box">
+            <div class="program-title">Industrial Attachment — {{ profile.course_name }}</div>
+        </div>
+
+        <p class="conducted-line">
+            Conducted by <span class="highlight-bold">the ICT Authority, Kenya</span>
+            in the <span class="highlight-bold">{{ profile.department.name }}</span> department
+        </p>
+
+        <!-- DATE -->
+        <p class="on-this-date-label">On this date</p>
+        <div class="date-value">{{ today|date:"F j, Y" }}</div>
+
+        <!-- CERTIFICATE ID -->
+        <p class="cert-id">Certificate ID: ICTA-{{ profile.registration_number }}-{{ today|date:"Y" }}</p>
+
+        <!-- FOOTER: SIGNATURE LEFT + QR RIGHT -->
+        <div class="cert-footer">
+
+            <!-- Signature Block -->
+            <div class="signature-block">
+                <!-- SVG placeholder signature curve -->
+                <svg width="160" height="55" viewBox="0 0 160 55" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M 20 42 C 35 20, 55 15, 70 30 C 85 45, 90 20, 110 25 C 125 28, 135 35, 145 38"
+                          fill="none" stroke="#1e293b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M 140 38 L 147 32 M 140 38 L 143 45"
+                          fill="none" stroke="#1e293b" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+                <div class="signature-line"></div>
+                <div class="sig-role">Chief Executive Officer</div>
+                <div class="sig-name">Director, ICT Authority</div>
+                <div class="sig-org">ICT Authority, Kenya</div>
+            </div>
+
+            <!-- QR Code Block -->
+            <div class="qr-block">
+                <img
+                    src="https://api.qrserver.com/v1/create-qr-code/?data=ICTA-CERT-{{ profile.registration_number }}-{{ today|date:'Y' }}&size=90x90&color=1e293b"
+                    alt="Verification QR Code"
+                    class="qr-code-img"
+                    onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?data=ICTA-CERT&size=90x90'"
+                >
+                <div class="qr-label">Scan to verify</div>
+            </div>
+
+        </div>
+
+    </div><!-- /cert-body -->
+
+    <!-- BOTTOM MOSAIC BORDER -->
+    <div class="border-bottom-strip"><div class="mosaic-pattern"></div></div>
+
+</div><!-- /cert-page -->
+
+</body>
+</html>

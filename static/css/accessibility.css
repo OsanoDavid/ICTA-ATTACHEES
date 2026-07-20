@@ -8,6 +8,7 @@
     transform: translateY(45px) scale(0.96);
     transition: opacity 1.6s cubic-bezier(0.16, 1, 0.3, 1), transform 1.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 [data-sprout].sprouted {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -19,6 +20,7 @@
     transform: translateY(38px) scale(0.97);
     transition: opacity 1.6s cubic-bezier(0.16, 1, 0.3, 1), transform 1.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 .sprout-auto.sprouted {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -46,11 +48,13 @@ body.acc-sidebar-open {
     width: 48px;
     height: 48px;
     background: transparent !important;
-    color: #475569; /* Slate grey */
+    color: #475569;
+    /* Slate grey */
     border: none !important;
     box-shadow: none !important;
     cursor: pointer;
-    font-size: 32px; /* Large and clear */
+    font-size: 32px;
+    /* Large and clear */
     transition: color 0.25s ease, transform 0.25s ease;
     display: flex;
     align-items: center;
@@ -62,7 +66,8 @@ body.acc-sidebar-open {
 }
 
 #accessibility-btn:hover {
-    color: #3b82f6; /* Vibrant blue on hover */
+    color: #3b82f6;
+    /* Vibrant blue on hover */
     transform: scale(1.15);
 }
 
@@ -83,18 +88,37 @@ body.acc-sidebar-open {
 }
 
 @keyframes gear-spin-idle {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
+
 @keyframes gear-spin-fast {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(720deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(720deg);
+    }
 }
 
 @keyframes gear-pulse {
-    0%   { box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 0 0 rgba(99,102,241,0.45); }
-    70%  { box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 0 10px rgba(99,102,241,0); }
-    100% { box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 0 0 rgba(99,102,241,0); }
+    0% {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 0 0 rgba(99, 102, 241, 0.45);
+    }
+
+    70% {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 0 10px rgba(99, 102, 241, 0);
+    }
+
+    100% {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 0 0 rgba(99, 102, 241, 0);
+    }
 }
 
 /* ===== THE SIDEBAR ITSELF ===== */
@@ -162,7 +186,8 @@ body.acc-sidebar-open {
     font-weight: 600;
 }
 
-.acc-option:hover, .acc-option.active {
+.acc-option:hover,
+.acc-option.active {
     background: #0d6efd;
     color: white;
     border-color: #0d6efd;
@@ -194,8 +219,15 @@ body.acc-sidebar-open {
 }
 
 @keyframes pulse {
-    0% { transform: scale(1); opacity: 1; }
-    100% { transform: scale(2.5); opacity: 0; }
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(2.5);
+        opacity: 0;
+    }
 }
 
 /* High Visibility Themes */
@@ -203,32 +235,47 @@ body.acc-sidebar-open {
     background-color: #d32f2f !important;
     color: white !important;
 }
-.theme-red * { 
+
+.theme-red * {
     color: white !important;
-    border-color: rgba(255,255,255,0.3) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
 }
-.theme-red .btn-primary { background-color: #ffffff !important; color: #d32f2f !important; border: none !important; }
+
+.theme-red .btn-primary {
+    background-color: #ffffff !important;
+    color: #d32f2f !important;
+    border: none !important;
+}
 
 .theme-yellow {
     background-color: #fdd835 !important;
     color: #000000 !important;
 }
+
 .theme-yellow * {
     color: #000000 !important;
-    border-color: rgba(0,0,0,0.2) !important;
+    border-color: rgba(0, 0, 0, 0.2) !important;
 }
-.theme-yellow .btn { border: 2px solid black !important; font-weight: 800 !important; }
+
+.theme-yellow .btn {
+    border: 2px solid black !important;
+    font-weight: 800 !important;
+}
 
 .theme-blue {
     background-color: #1565c0 !important;
     color: white !important;
 }
-.theme-blue * { color: white !important; }
+
+.theme-blue * {
+    color: white !important;
+}
 
 /* Visual Display Modes */
 .display-dark {
     filter: invert(1) hue-rotate(180deg) !important;
 }
+
 .display-dark img,
 .display-dark video,
 .display-dark [class*="logo"] {
@@ -267,7 +314,7 @@ body.acc-sidebar-open {
     padding: 0;
     line-height: 1;
     flex-shrink: 0;
-    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -336,27 +383,65 @@ body.acc-sidebar-open {
 }
 
 /* Arc 1 — Flame Red, fastest */
-.arc-1 { animation: spin-cw 0.8s linear infinite; filter: drop-shadow(0 0 5px #FF1744); }
+.arc-1 {
+    animation: spin-cw 0.8s linear infinite;
+    filter: drop-shadow(0 0 5px #FF1744);
+}
+
 /* Arc 2 — Deep Orange */
-.arc-2 { animation: spin-ccw 1.1s linear infinite; filter: drop-shadow(0 0 5px #FF6D00); }
+.arc-2 {
+    animation: spin-ccw 1.1s linear infinite;
+    filter: drop-shadow(0 0 5px #FF6D00);
+}
+
 /* Arc 3 — Amber/Gold */
-.arc-3 { animation: spin-cw 1.4s linear infinite; filter: drop-shadow(0 0 5px #FFD600); }
+.arc-3 {
+    animation: spin-cw 1.4s linear infinite;
+    filter: drop-shadow(0 0 5px #FFD600);
+}
+
 /* Arc 4 — Kenya Green */
-.arc-4 { animation: spin-ccw 1.8s linear infinite; filter: drop-shadow(0 0 5px #00C853); }
+.arc-4 {
+    animation: spin-ccw 1.8s linear infinite;
+    filter: drop-shadow(0 0 5px #00C853);
+}
+
 /* Arc 5 — Electric Blue */
-.arc-5 { animation: spin-cw 2.2s linear infinite; filter: drop-shadow(0 0 5px #00B0FF); }
+.arc-5 {
+    animation: spin-cw 2.2s linear infinite;
+    filter: drop-shadow(0 0 5px #00B0FF);
+}
+
 /* Arc 6 — Purple */
-.arc-6 { animation: spin-ccw 2.7s linear infinite; filter: drop-shadow(0 0 5px #AA00FF); }
+.arc-6 {
+    animation: spin-ccw 2.7s linear infinite;
+    filter: drop-shadow(0 0 5px #AA00FF);
+}
+
 /* Arc 7 — White, slowest */
-.arc-7 { animation: spin-cw 3.4s linear infinite; filter: drop-shadow(0 0 4px rgba(255,255,255,0.7)); }
+.arc-7 {
+    animation: spin-cw 3.4s linear infinite;
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.7));
+}
 
 @keyframes spin-cw {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
+
 @keyframes spin-ccw {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(-360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(-360deg);
+    }
 }
 
 .loader-text {
@@ -368,19 +453,33 @@ body.acc-sidebar-open {
     text-transform: uppercase;
     text-align: center;
     z-index: 10;
-    text-shadow: 0 0 12px #FF6D00, 0 0 25px #FF1744, 0 0 40px rgba(255,100,0,0.4);
+    text-shadow: 0 0 12px #FF6D00, 0 0 25px #FF1744, 0 0 40px rgba(255, 100, 0, 0.4);
     animation: pulse-text 1.8s ease-in-out infinite;
 }
 
 @keyframes pulse-text {
-    0%, 100% { opacity: 0.75; transform: scale(0.95); }
-    50%       { opacity: 1;    transform: scale(1.05); }
+
+    0%,
+    100% {
+        opacity: 0.75;
+        transform: scale(0.95);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
 }
 
 /* ===== SOCIAL MEDIA BRAND STYLING & SPINNING ===== */
 @keyframes social-spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .social-link {
@@ -415,6 +514,7 @@ body.acc-sidebar-open {
     background: #1DA1F2 !important;
     border: 1px solid rgba(29, 161, 242, 0.3) !important;
 }
+
 .social-link.twitter:hover {
     background: #0d8bd9 !important;
 }
@@ -423,6 +523,7 @@ body.acc-sidebar-open {
     background: #0077B5 !important;
     border: 1px solid rgba(0, 119, 181, 0.3) !important;
 }
+
 .social-link.linkedin:hover {
     background: #005987 !important;
 }
@@ -431,6 +532,7 @@ body.acc-sidebar-open {
     background: #24292e !important;
     border: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
+
 .social-link.github:hover {
     background: #181c20 !important;
 }
@@ -439,6 +541,7 @@ body.acc-sidebar-open {
     background: #1877F2 !important;
     border: 1px solid rgba(24, 119, 242, 0.3) !important;
 }
+
 .social-link.facebook:hover {
     background: #135cb3 !important;
 }
@@ -447,6 +550,7 @@ body.acc-sidebar-open {
     background: #25D366 !important;
     border: 1px solid rgba(37, 211, 102, 0.3) !important;
 }
+
 .social-link.whatsapp:hover {
     background: #1aab52 !important;
     box-shadow: 0 8px 20px rgba(37, 211, 102, 0.45) !important;

@@ -14,6 +14,7 @@ class User(AbstractUser):
         ('ADMIN', 'System Administrator'),
         ('SUPERVISOR', 'Department Supervisor'),
         ('ATTACHEE', 'ICT Attachée'),
+        ('HR', 'Human Resources Officer'),
     )
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='ATTACHEE')
     # Link supervisor users to a specific Department they manage
@@ -53,7 +54,8 @@ class AttacheeProfile(models.Model):
     )
     
     STATUS_CHOICES = (
-        ('PENDING', 'Pending Approval'),
+        ('PENDING_HR', 'Pending HR Approval'),
+        ('PENDING', 'Pending Supervisor Approval'),
         ('APPROVED', 'Approved (Waiting to Start)'),
         ('ACTIVE', 'Active on Program'),
         ('COMPLETED', 'Attachment Finished'),
@@ -70,11 +72,12 @@ class AttacheeProfile(models.Model):
     
     # ForeignKey ensures an attachée can ONLY belong to one department
     department = models.ForeignKey(Department, on_delete=models.PROTECT, related_name='attachees')
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING_HR')
     # Attachment period dates
     attachment_start_date = models.DateField(null=True, blank=True, help_text="Start date of industrial attachment")
     attachment_end_date = models.DateField(null=True, blank=True, help_text="End date of industrial attachment")
     created_at = models.DateTimeField(auto_now_add=True)
+    certificate_approved = models.BooleanField(default=False)
 
     def update_status(self):
         """
