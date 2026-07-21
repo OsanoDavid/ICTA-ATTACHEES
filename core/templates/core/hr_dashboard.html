@@ -292,7 +292,7 @@
                                                         <i class="bi bi-check-circle me-1"></i> Approve
                                                     </button>
                                                     <button type="button" class="btn btn-sm btn-outline-primary fw-bold" 
-                                                            onclick="openEditModal('{{ profile.id }}', '{{ profile.full_name|escapejs }}', '{{ profile.registration_number|escapejs }}', '{{ profile.national_id|escapejs }}', '{{ profile.institution|escapejs }}', '{{ profile.course_name|escapejs }}', '{{ profile.department_id }}', '{{ profile.attachment_start_date|date:'Y-m-d' }}', '{{ profile.attachment_end_date|date:'Y-m-d' }}')">
+                                                            onclick="openEditModal('{{ profile.id }}', '{{ profile.full_name|escapejs }}', '{{ profile.registration_number|escapejs }}', '{{ profile.national_id|default:''|escapejs }}', '{{ profile.institution|escapejs }}', '{{ profile.course_name|escapejs }}', '{{ profile.department_id }}', '{{ profile.attachment_start_date|date:'Y-m-d' }}', '{{ profile.attachment_end_date|date:'Y-m-d' }}')">
                                                         <i class="bi bi-pencil-square"></i> Edit
                                                     </button>
                                                     <a href="{% url 'hr_reject_attachee' profile.id %}" class="btn btn-sm btn-outline-warning fw-bold" onclick="return confirm('Reject this student registration?');">
@@ -425,7 +425,7 @@
                                                 <div class="d-inline-flex gap-2">
                                                     <!-- Edit Button -->
                                                     <button type="button" class="btn btn-sm btn-outline-secondary" 
-                                                            onclick="openEditModal('{{ profile.id }}', '{{ profile.full_name|escapejs }}', '{{ profile.registration_number|escapejs }}', '{{ profile.national_id|escapejs }}', '{{ profile.institution|escapejs }}', '{{ profile.course_name|escapejs }}', '{{ profile.department_id }}', '{{ profile.attachment_start_date|date:'Y-m-d' }}', '{{ profile.attachment_end_date|date:'Y-m-d' }}')">
+                                                            onclick="openEditModal('{{ profile.id }}', '{{ profile.full_name|escapejs }}', '{{ profile.registration_number|escapejs }}', '{{ profile.national_id|default:''|escapejs }}', '{{ profile.institution|escapejs }}', '{{ profile.course_name|escapejs }}', '{{ profile.department_id }}', '{{ profile.attachment_start_date|date:'Y-m-d' }}', '{{ profile.attachment_end_date|date:'Y-m-d' }}')">
                                                         <i class="bi bi-pencil-square"></i> Edit
                                                     </button>
                                                     
