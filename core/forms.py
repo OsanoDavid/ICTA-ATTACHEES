@@ -47,8 +47,7 @@ class AttacheeRegistrationForm(forms.ModelForm):
         required_suffix = config.username_suffix.strip()
         if not username.endswith(required_suffix):
             raise forms.ValidationError(
-                f"Your username must end with '{required_suffix}'. "
-                f"Example: yourname{required_suffix}"
+                "Invalid username format. Please obtain the correct registration instructions from HR."
             )
         # --- End suffix check ---
 
