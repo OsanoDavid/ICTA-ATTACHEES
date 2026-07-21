@@ -222,9 +222,26 @@ class AttacheeProfileAdmin(admin.ModelAdmin):
             return "—"
         
         from django.utils import timezone
+        import datetime
         today = timezone.now().date()
-        total_days = (obj.attachment_end_date - obj.attachment_start_date).days
-        elapsed_days = (today - obj.attachment_start_date).days
+
+        start_date = obj.attachment_start_date
+        end_date = obj.attachment_end_date
+
+        if isinstance(start_date, str):
+            try:
+                start_date = datetime.date.fromisoformat(start_date)
+            except ValueError:
+                return "—"
+
+        if isinstance(end_date, str):
+            try:
+                end_date = datetime.date.fromisoformat(end_date)
+            except ValueError:
+                return "—"
+
+        total_days = (end_date - start_date).days
+        elapsed_days = (today - start_date).days
         
         if elapsed_days < 0: percent = 0
         elif elapsed_days > total_days: percent = 100

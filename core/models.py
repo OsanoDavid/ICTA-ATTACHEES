@@ -87,19 +87,35 @@ class AttacheeProfile(models.Model):
         ACTIVE/APPROVED -> COMPLETED when today > end_date
         """
         from django.utils import timezone
+        import datetime
         today = timezone.now().date()
         
         changed = False
+
+        start_date = self.attachment_start_date
+        end_date = self.attachment_end_date
+
+        if isinstance(start_date, str):
+            try:
+                start_date = datetime.date.fromisoformat(start_date)
+            except ValueError:
+                start_date = None
+
+        if isinstance(end_date, str):
+            try:
+                end_date = datetime.date.fromisoformat(end_date)
+            except ValueError:
+                end_date = None
         
         # Rule 1: Auto-complete if end date passed (highest priority)
-        if self.status in ['APPROVED', 'ACTIVE'] and self.attachment_end_date:
-            if today > self.attachment_end_date:
+        if self.status in ['APPROVED', 'ACTIVE'] and end_date:
+            if today > end_date:
                 self.status = 'COMPLETED'
                 changed = True
         
         # Rule 2: Activate if start date reached and not yet completed
-        if self.status == 'APPROVED' and self.attachment_start_date:
-            if today >= self.attachment_start_date and today <= (self.attachment_end_date or today):
+        if self.status == 'APPROVED' and start_date:
+            if today >= start_date and today <= (end_date or today):
                 self.status = 'ACTIVE'
                 changed = True
                 
@@ -295,7 +311,7 @@ class GeneratedShift(models.Model):
     def __str__(self):
         return f"{self.attachee.full_name} - {self.date} ({self.work_mode})"
     
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 
 @receiver(post_save, sender=RosterConfiguration)
@@ -303,13 +319,20 @@ def execute_algorithmic_schedule(sender, instance, **kwargs):
     """
     Computes precise calendar dates for multiple attachees based on a shared rule.
     """
-    # This signal now runs for each configuration. We iterate through the associated attachees.
-    # Note: The m2m_changed signal is often better for ManyToMany, but post_save works for creation.
+    start_date = instance.rotation_start_date
+    if not start_date:
+        return
+
+    if isinstance(start_date, str):
+        try:
+            start_date = datetime.date.fromisoformat(start_date)
+        except ValueError:
+            return
+
     for attachee in instance.attachees.all():
         # Wipe out future assignments to recalculate cleanly from the start date
-        GeneratedShift.objects.filter(attachee=attachee, date__gte=instance.rotation_start_date).delete()
+        GeneratedShift.objects.filter(attachee=attachee, date__gte=start_date).delete()
         
-        start_date = instance.rotation_start_date
         shifts_to_create = []
         
         # Determine the remote gap size if an interval mode is chosen
@@ -359,3 +382,10 @@ def execute_algorithmic_schedule(sender, instance, **kwargs):
             )
             
         GeneratedShift.objects.bulk_create(shifts_to_create)
+
+
+@receiver(m2m_changed, sender=RosterConfiguration.attachees.through)
+def execute_algorithmic_schedule_m2m(sender, instance, action, **kwargs):
+    if action in ['post_add', 'post_remove', 'post_clear']:
+        execute_algorithmic_schedule(sender=RosterConfiguration, instance=instance)
+
