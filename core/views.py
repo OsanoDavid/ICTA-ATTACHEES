@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.utils import timezone
 from django.conf import settings
 from django.core.mail import send_mail
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
@@ -1154,6 +1154,10 @@ def hr_add_attachee(request):
         if AttacheeProfile.objects.filter(registration_number=registration_number).exists():
             messages.error(request, "An attachée with this registration number already exists.")
             return redirect('hr_dashboard')
+
+        if national_id and AttacheeProfile.objects.filter(national_id=national_id).exists():
+            messages.error(request, "An attachée with this National ID already exists.")
+            return redirect('hr_dashboard')
             
         with transaction.atomic():
             user = User.objects.create_user(
@@ -1225,9 +1229,21 @@ def hr_edit_attachee(request, profile_id):
     profile = get_object_or_404(AttacheeProfile, id=profile_id)
     
     if request.method == 'POST':
-        profile.full_name = request.POST.get('full_name', profile.full_name)
-        profile.registration_number = request.POST.get('registration_number', profile.registration_number)
-        profile.national_id = request.POST.get('national_id', profile.national_id)
+        full_name = request.POST.get('full_name', profile.full_name)
+        reg_num = request.POST.get('registration_number', profile.registration_number)
+        nat_id = request.POST.get('national_id', profile.national_id)
+
+        if reg_num and AttacheeProfile.objects.exclude(id=profile.id).filter(registration_number=reg_num).exists():
+            messages.error(request, f"Registration number '{reg_num}' is already assigned to another attachée.")
+            return redirect('hr_dashboard')
+
+        if nat_id and AttacheeProfile.objects.exclude(id=profile.id).filter(national_id=nat_id).exists():
+            messages.error(request, f"National ID '{nat_id}' is already registered to another attachée.")
+            return redirect('hr_dashboard')
+
+        profile.full_name = full_name
+        profile.registration_number = reg_num
+        profile.national_id = nat_id
         profile.course_name = request.POST.get('course_name', profile.course_name)
         profile.institution = request.POST.get('institution', profile.institution)
         
@@ -1250,8 +1266,11 @@ def hr_edit_attachee(request, profile_id):
                 messages.error(request, "Invalid end date format. Use YYYY-MM-DD.")
                 return redirect('hr_dashboard')
             
-        profile.save()
-        messages.success(request, f"Profile details for {profile.full_name} have been updated successfully.")
+        try:
+            profile.save()
+            messages.success(request, f"Profile details for {profile.full_name} have been updated successfully.")
+        except IntegrityError:
+            messages.error(request, "Failed to update profile: National ID or Registration Number must be unique.")
         
     return redirect('hr_dashboard')
 
