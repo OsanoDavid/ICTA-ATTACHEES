@@ -1,7 +1,8 @@
 from django import forms
 from django.db import transaction
-from .models import User, AttacheeProfile, Department, WeeklyLog
+from .models import User, AttacheeProfile, Department, WeeklyLog, RegistrationConfig
 from .constants import KENYAN_INSTITUTIONS
+
 
 class AttacheeRegistrationForm(forms.ModelForm):
     username = forms.CharField(max_length=150, required=True)
@@ -33,10 +34,29 @@ class AttacheeRegistrationForm(forms.ModelForm):
         if password != confirm_password:
             raise forms.ValidationError("Passwords do not match.")
 
-        if User.objects.filter(username=cleaned_data.get('username')).exists():
+        username = cleaned_data.get('username', '').strip()
+
+        # --- Suffix format enforcement ---
+        config = RegistrationConfig.get_config()
+        if config is None:
+            # No suffix configured by HR — block all registrations
+            raise forms.ValidationError(
+                "Registrations are currently closed. Please contact HR to open registration."
+            )
+
+        required_suffix = config.username_suffix.strip()
+        if not username.endswith(required_suffix):
+            raise forms.ValidationError(
+                f"Your username must end with '{required_suffix}'. "
+                f"Example: yourname{required_suffix}"
+            )
+        # --- End suffix check ---
+
+        if User.objects.filter(username=username).exists():
             raise forms.ValidationError("A user with this username already exists.")
 
         return cleaned_data
+
 
     @transaction.atomic
     def save(self, commit=True):

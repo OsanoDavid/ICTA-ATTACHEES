@@ -1,6 +1,6 @@
 import datetime
 from datetime import timedelta
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
 from django.conf import settings
 from django.core.mail import send_mail
@@ -20,7 +20,8 @@ from .models import (
     FinalAssessment, 
     GeneratedShift, 
     WeeklyLog,
-    RosterConfiguration
+    RosterConfiguration,
+    RegistrationConfig
 )
 from .forms import WeeklyLogForm, AttacheeRegistrationForm
 from .utils import generate_weekly_shifts
@@ -157,6 +158,10 @@ def register_view(request):
     # Fetch only verified departments for the initial dropdown select choices
     departments = Department.objects.filter(is_verified=True)
     
+    # Fetch the suffix config
+    config = RegistrationConfig.get_config()
+    username_suffix_hint = config.username_suffix.strip() if config else None
+
     if request.method == 'POST':
         form = AttacheeRegistrationForm(request.POST, departments=departments)
         if form.is_valid():
@@ -176,7 +181,9 @@ def register_view(request):
     return render(request, 'core/register.html', {
         'departments': departments,
         'form': form,
+        'username_suffix_hint': username_suffix_hint,
     })
+
 
 @login_required
 def admin_pending_count_view(request):
@@ -1058,6 +1065,8 @@ def hr_dashboard(request):
             else:
                 profile.progress_percent = int((elapsed_days / total_days) * 100) if total_days > 0 else 0
 
+    reg_config = RegistrationConfig.get_config()
+
     context = {
         'total_attachees': total_attachees,
         'pending_hr_count': pending_hr_count,
@@ -1071,6 +1080,7 @@ def hr_dashboard(request):
         'q': q,
         'selected_dept': selected_dept,
         'selected_status': selected_status,
+        'reg_config': reg_config,
     }
     return render(request, 'core/hr_dashboard.html', context)
 
@@ -1386,3 +1396,87 @@ def certificate_pdf(request):
     response = HttpResponse(buffer, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     return response
+
+
+@login_required
+def hr_export_certified_excel(request):
+    import openpyxl
+    if request.user.role != 'HR' and not request.user.is_superuser:
+        messages.error(request, "Access Denied: HR clearance required.")
+        return redirect('login_view')
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Certified Attachees"
+
+    # Define headers
+    headers = [
+        "Full Name", "Gender", "National ID", "Email", 
+        "Start Date", "End Date", "Course", 
+        "University", "Department", "Registration Number"
+    ]
+    ws.append(headers)
+
+    profiles = AttacheeProfile.objects.filter(certificate_approved=True).select_related('department', 'user')
+
+    today = timezone.now().date()
+    for profile in profiles:
+        progress_percent = 0
+        if profile.attachment_start_date and profile.attachment_end_date:
+            total_days = (profile.attachment_end_date - profile.attachment_start_date).days
+            elapsed_days = (today - profile.attachment_start_date).days
+            if elapsed_days < 0:
+                progress_percent = 0
+            elif elapsed_days > total_days:
+                progress_percent = 100
+            else:
+                progress_percent = int((elapsed_days / total_days) * 100) if total_days > 0 else 0
+        else:
+            progress_percent = 0
+
+        # Account with 100% progress and issued certificate
+        if progress_percent == 100:
+            ws.append([
+                profile.full_name,
+                profile.get_gender_display(),
+                profile.national_id or "",
+                profile.user.email,
+                profile.attachment_start_date.strftime('%Y-%m-%d') if profile.attachment_start_date else "",
+                profile.attachment_end_date.strftime('%Y-%m-%d') if profile.attachment_end_date else "",
+                profile.course_name,
+                profile.institution,
+                profile.department.name if profile.department else "",
+                profile.registration_number
+            ])
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename="certified_attachees.xlsx"'
+    wb.save(response)
+    return response
+
+
+@login_required
+def hr_save_registration_config(request):
+    if request.user.role != 'HR' and not request.user.is_superuser:
+        messages.error(request, "Access Denied: HR clearance required.")
+        return redirect('login_view')
+
+    if request.method == 'POST':
+        suffix = request.POST.get('username_suffix', '').strip()
+        if not suffix:
+            messages.error(request, "Username suffix cannot be empty.")
+            return redirect('hr_dashboard')
+
+        config = RegistrationConfig.objects.first()
+        if config:
+            config.username_suffix = suffix
+            config.save()
+        else:
+            RegistrationConfig.objects.create(username_suffix=suffix)
+            
+        messages.success(request, f"Registration username suffix constraint updated to '{suffix}' successfully.")
+    
+    return redirect('hr_dashboard')
+

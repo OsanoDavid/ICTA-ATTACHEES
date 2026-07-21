@@ -394,3 +394,28 @@ def execute_algorithmic_schedule_m2m(sender, instance, action, **kwargs):
     if action in ['post_add', 'post_remove', 'post_clear']:
         execute_algorithmic_schedule(sender=RosterConfiguration, instance=instance)
 
+
+# -----------------------------------------------------------------------
+# HR Registration Format Control
+# A single-row config table. HR sets the username suffix (e.g. /026).
+# If no row exists, registration is BLOCKED until HR configures it.
+# -----------------------------------------------------------------------
+class RegistrationConfig(models.Model):
+    username_suffix = models.CharField(
+        max_length=50,
+        help_text="Suffix that every new attachée username must end with. E.g.  /026"
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Registration Configuration"
+        verbose_name_plural = "Registration Configurations"
+
+    def __str__(self):
+        return f"Registration Suffix: {self.username_suffix}"
+
+    @classmethod
+    def get_config(cls):
+        """Return the single active config row, or None if not set."""
+        return cls.objects.first()
+

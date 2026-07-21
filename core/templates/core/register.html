@@ -687,6 +687,15 @@
                     <div class="field-group">
                         <label>Username <span class="req">*</span></label>
                         <input type="text" name="username" id="fs_username" placeholder="e.g., john.kamau" required autocomplete="username" value="{{ form.username.value|default_if_none:'' }}">
+                        {% if username_suffix_hint %}
+                            <div class="date-hint" style="color: #3b82f6; font-weight: 600; font-size: 0.76rem; margin-top: 5px;">
+                                <i class="fa-solid fa-circle-info"></i> Must end with <strong>{{ username_suffix_hint }}</strong> (e.g., username{{ username_suffix_hint }})
+                            </div>
+                        {% else %}
+                            <div class="date-hint" style="color: #ef4444; font-weight: 600; font-size: 0.76rem; margin-top: 5px;">
+                                <i class="fa-solid fa-circle-exclamation"></i> Registrations are closed (suffix not set by HR).
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="field-group">
                         <label>Email Address <span class="req">*</span></label>

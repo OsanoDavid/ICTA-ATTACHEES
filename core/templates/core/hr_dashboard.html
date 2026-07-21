@@ -470,6 +470,79 @@
         </div>
     </div>
 
+    <!-- EXCEL SHEET DOWNLOAD & REGISTRATION CONFIGURATION PANEL -->
+    <div class="container mt-4">
+        <div class="row g-4">
+            <!-- Excel Export Card -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-success-subtle p-3 rounded-3 me-3">
+                                    <i class="bi bi-file-earmark-excel-fill text-success fs-3"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-1">Export Certified Register</h5>
+                                    <p class="text-muted small mb-0">Download student data as a spreadsheet</p>
+                                </div>
+                            </div>
+                            <p class="text-secondary small">
+                                Downloads an Excel sheet containing details of all attachées who have achieved <strong>100% progress</strong> and have had their <strong>certificate approved and issued</strong> by HR.
+                            </p>
+                        </div>
+                        <div class="mt-4">
+                            <a href="{% url 'hr_export_certified_excel' %}" class="btn btn-success fw-bold w-100 py-2.5 rounded-3">
+                                <i class="bi bi-download me-2"></i> Download Excel Register
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Username Suffix Format Card -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-primary-subtle p-3 rounded-3 me-3">
+                                <i class="bi bi-key-fill text-primary fs-3"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-1">Username Format Control</h5>
+                                <p class="text-muted small mb-0">Set registration username suffix format</p>
+                            </div>
+                        </div>
+                        <p class="text-secondary small mb-3">
+                            Define the suffix (e.g. <code>/026</code>) required for all new attachée registrations. 
+                            Users will be blocked from registering if their username does not end with this suffix.
+                        </p>
+                        <form action="{% url 'hr_save_registration_config' %}" method="POST">
+                            {% csrf_token %}
+                            <div class="input-group mb-3">
+                                <span class="input-group-text bg-light text-secondary font-monospace" id="suffix-addon">suffix:</span>
+                                <input type="text" name="username_suffix" class="form-control font-monospace" placeholder="e.g. /026" value="{{ reg_config.username_suffix|default:'' }}" aria-describedby="suffix-addon" required>
+                                <button class="btn btn-primary fw-bold px-4" type="submit">
+                                    <i class="bi bi-save me-1"></i> Save
+                                </button>
+                            </div>
+                        </form>
+                        {% if reg_config %}
+                            <div class="alert alert-info py-2 px-3 mb-0 rounded-3 small border-0 bg-info-subtle text-info-emphasis">
+                                <i class="bi bi-info-circle-fill me-1"></i> Active rule: New attachée usernames must end with <strong>"{{ reg_config.username_suffix }}"</strong>.
+                            </div>
+                        {% else %}
+                            <div class="alert alert-danger py-2 px-3 mb-0 rounded-3 small border-0 bg-danger-subtle text-danger-emphasis">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i> No suffix format configured! <strong>New registrations are currently blocked.</strong>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- MODAL: ADD ATTACHEE DIRECTLY -->
     <div class="modal fade" id="addAttacheeModal" tabindex="-1" aria-labelledby="addAttacheeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">

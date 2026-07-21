@@ -36,6 +36,8 @@ urlpatterns = [
     path('hr/edit-attachee/<int:profile_id>/', views.hr_edit_attachee, name='hr_edit_attachee'),
     path('hr/delete-attachee/<int:profile_id>/', views.hr_delete_attachee, name='hr_delete_attachee'),
     path('hr/issue-certificate/<int:profile_id>/', views.hr_issue_certificate, name='hr_issue_certificate'),
+    path('hr/export-certified/', views.hr_export_certified_excel, name='hr_export_certified_excel'),
+    path('hr/registration-config/', views.hr_save_registration_config, name='hr_save_registration_config'),
     path('attachee/certificate/', views.attachee_certificate, name='attachee_certificate'),
     path('attachee/certificate/pdf/', views.certificate_pdf, name='certificate_pdf'),
 

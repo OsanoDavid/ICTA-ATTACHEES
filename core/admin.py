@@ -5,7 +5,8 @@ from django.utils.html import format_html
 from .models import (
     User, Department, Section, AttacheeProfile, 
     RosterConfiguration, GeneratedShift, Task, 
-    WeeklyLog, FinalAssessment, ShiftAssignment
+    WeeklyLog, FinalAssessment, ShiftAssignment,
+    RegistrationConfig
 )
 
 # ==========================================
@@ -552,3 +553,9 @@ class ShiftAssignmentAdmin(admin.ModelAdmin):
     def cancel_assignment(self, request, queryset):
         queryset.delete()
     cancel_assignment.short_description = "🗑️ Cancel Selected Assignments"
+
+
+@admin.register(RegistrationConfig)
+class RegistrationConfigAdmin(admin.ModelAdmin):
+    list_display = ('username_suffix', 'updated_at')
+
