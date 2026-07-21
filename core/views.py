@@ -1231,7 +1231,17 @@ def hr_edit_attachee(request, profile_id):
     if request.method == 'POST':
         full_name = request.POST.get('full_name', profile.full_name)
         reg_num = request.POST.get('registration_number', profile.registration_number)
-        nat_id = request.POST.get('national_id', profile.national_id)
+        nat_id = request.POST.get('national_id')
+        
+        if nat_id is not None:
+            nat_id = nat_id.strip()
+            if nat_id == '':
+                nat_id = None
+        else:
+            nat_id = profile.national_id
+
+        if reg_num:
+            reg_num = reg_num.strip()
 
         if reg_num and AttacheeProfile.objects.exclude(id=profile.id).filter(registration_number=reg_num).exists():
             messages.error(request, f"Registration number '{reg_num}' is already assigned to another attachée.")

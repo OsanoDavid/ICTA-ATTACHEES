@@ -122,6 +122,11 @@ class AttacheeProfile(models.Model):
         return changed
 
     def save(self, *args, **kwargs):
+        if self.national_id is not None:
+            if isinstance(self.national_id, str):
+                self.national_id = self.national_id.strip()
+                if self.national_id == '':
+                    self.national_id = None
         # Trigger auto-status update before saving
         self.update_status()
         super().save(*args, **kwargs)
