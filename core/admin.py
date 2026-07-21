@@ -36,11 +36,14 @@ class StaffUserFilter(admin.SimpleListFilter):
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
+    # last_login and date_joined must be readonly — Django sets them internally.
+    # Putting them in writable fieldsets causes a 500 error (timezone mismatch on save).
+    readonly_fields = ('last_login', 'date_joined')
     fieldsets = (
         ('🔐 Account Credentials', {'fields': ('username', 'password')}),
         ('👤 Personal Details', {'fields': ('first_name', 'last_name', 'email')}),
         ('🎭 System Role Assignment', {'fields': ('role', 'department', 'is_staff', 'is_active', 'is_superuser')}),
-        ('📅 Important Dates', {'fields': ('last_login', 'date_joined')}),
+        ('📅 Activity Timestamps (Read-Only)', {'fields': ('last_login', 'date_joined')}),
     )
     list_display = ['get_user_display', 'email', 'get_role_badge', 'get_category_label', 'is_active_badge']
     list_filter = [StaffUserFilter, 'role', 'is_staff', 'is_active']
@@ -191,7 +194,29 @@ class AttacheeProfileAdmin(admin.ModelAdmin):
     ordering = ['full_name']
     list_per_page = 25
     actions = ['mark_as_completed', 'cancel_registration']
-    
+    # created_at is auto_now_add so must be readonly
+    readonly_fields = ('created_at',)
+
+    fieldsets = (
+        ('👤 Personal Information', {
+            'fields': ('user', 'full_name', 'gender', 'national_id')
+        }),
+        ('🎓 Academic Details', {
+            'fields': ('registration_number', 'course_name', 'institution')
+        }),
+        ('🏢 Placement & Status', {
+            'fields': ('department', 'status', 'certificate_approved')
+        }),
+        ('📅 Attachment Period', {
+            'fields': ('attachment_start_date', 'attachment_end_date'),
+            'description': 'Set or update the start and end dates of the attachée\'s placement period.'
+        }),
+        ('🕒 Record Info', {
+            'fields': ('created_at',),
+            'classes': ('collapse',),
+        }),
+    )
+
     # Inject Custom CSS to beautify the Status and Multi-Select widgets
     class Media:
         css = {
