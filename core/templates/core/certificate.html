@@ -390,19 +390,76 @@
         }
 
         /* ── PRINT STYLES ── */
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+
         @media print {
             body {
-                background: white;
-                padding: 0;
-                margin: 0;
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
             .print-controls { display: none !important; }
             .cert-page {
-                box-shadow: none;
-                width: 100%;
+                box-shadow: none !important;
+                width: 297mm !important;
+                height: 210mm !important;
+                margin: 0 auto !important;
+                position: relative !important;
+                page-break-after: avoid !important;
+                break-after: avoid !important;
             }
         }
+
+        /* ── PDF MODE / XHTML FALLBACKS FOR XHTML2PDF ── */
+        {% if pdf_mode %}
+        body {
+            background: white !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .cert-page {
+            width: 100% !important;
+            box-shadow: none !important;
+        }
+        .logos-row {
+            display: table !important;
+            width: 100% !important;
+        }
+        .logo-ministry, .logo-icta {
+            display: table-cell !important;
+            vertical-align: middle !important;
+            width: 48% !important;
+        }
+        .cert-footer {
+            display: table !important;
+            width: 100% !important;
+        }
+        .signature-block {
+            display: table-cell !important;
+            vertical-align: bottom !important;
+            width: 50% !important;
+            text-align: left !important;
+        }
+        .qr-block {
+            display: table-cell !important;
+            vertical-align: bottom !important;
+            width: 50% !important;
+            text-align: right !important;
+        }
+        .qr-code-img {
+            display: inline-block !important;
+            width: 90px !important;
+            height: 90px !important;
+        }
+        {% endif %}
     </style>
+    <!-- Include html2pdf.js for instant high-fidelity client-side PDF download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -410,9 +467,9 @@
 <!-- Print Action Buttons -->
 <div class="print-controls">
     <a href="javascript:history.back()" class="btn-ctrl btn-back">&#8592; Go Back</a>
-    <a href="{% url 'certificate_pdf' %}{% if request.GET.profile_id %}?profile_id={{ request.GET.profile_id }}{% endif %}" class="btn-ctrl" style="background:#15803d;">
+    <button id="downloadPdfBtn" onclick="downloadCertificatePDF()" class="btn-ctrl" style="background:#15803d;">
         &#128229; Download PDF
-    </a>
+    </button>
     <button class="btn-ctrl" onclick="window.print()">&#128424;&#65039; Print</button>
 </div>
 {% endif %}
@@ -459,7 +516,7 @@
             </div>
 
             <!-- Divider -->
-            <div style="width: 1px; height: 50px; background: #cbd5e1;"></div>
+            <div style="width: 1px; height: 50px; background: #cbd5e1; display: inline-block;"></div>
 
             <!-- ICT Authority -->
             <div class="logo-icta">
@@ -539,6 +596,7 @@
                     src="https://api.qrserver.com/v1/create-qr-code/?data=ICTA-CERT-{{ profile.registration_number }}-{{ today|date:'Y' }}&size=90x90&color=1e293b"
                     alt="Verification QR Code"
                     class="qr-code-img"
+                    crossorigin="anonymous"
                     onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?data=ICTA-CERT&size=90x90'"
                 >
                 <div class="qr-label">Scan to verify</div>
@@ -552,6 +610,48 @@
     <div class="border-bottom-strip"><div class="mosaic-pattern"></div></div>
 
 </div><!-- /cert-page -->
+
+<script>
+function downloadCertificatePDF() {
+    const btn = document.getElementById('downloadPdfBtn');
+    if (!btn) return;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '&#9251; Generating PDF...';
+    btn.disabled = true;
+
+    const element = document.querySelector('.cert-page');
+    
+    // Ensure all images are loaded before generating PDF
+    const opt = {
+        margin:       0,
+        filename:     'ICTA_Certificate_{{ profile.registration_number|slugify }}.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { 
+            scale: 2.5, 
+            useCORS: true, 
+            allowTaint: true,
+            logging: false
+        },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+    };
+
+    if (window.html2pdf) {
+        html2pdf().set(opt).from(element).save().then(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }).catch(err => {
+            console.error('html2pdf error:', err);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            // Fallback to server endpoint if html2pdf fails
+            window.location.href = "{% url 'certificate_pdf' %}{% if request.GET.profile_id %}?profile_id={{ request.GET.profile_id }}{% endif %}";
+        });
+    } else {
+        // Fallback to server endpoint
+        window.location.href = "{% url 'certificate_pdf' %}{% if request.GET.profile_id %}?profile_id={{ request.GET.profile_id }}{% endif %}";
+    }
+}
+</script>
 
 </body>
 </html>
