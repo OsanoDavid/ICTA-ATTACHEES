@@ -1,6 +1,6 @@
 from django import forms
 from django.db import transaction
-from .models import User, AttacheeProfile, Department, WeeklyLog, RegistrationConfig
+from .models import User, AttacheeProfile, Department, WeeklyLog, RegistrationConfig, calculate_default_end_date
 from .constants import KENYAN_INSTITUTIONS
 
 
@@ -9,6 +9,7 @@ class AttacheeRegistrationForm(forms.ModelForm):
     email = forms.EmailField(required=True)
     password = forms.CharField(widget=forms.PasswordInput, required=True)
     confirm_password = forms.CharField(widget=forms.PasswordInput, required=True)
+    attachment_end_date = forms.DateField(required=False)
     
     # Convert institution to a dropdown
     institution = forms.ChoiceField(choices=KENYAN_INSTITUTIONS, required=True)
@@ -16,8 +17,8 @@ class AttacheeRegistrationForm(forms.ModelForm):
     class Meta:
         model = AttacheeProfile
         fields = [
-            'full_name', 'gender', 'registration_number', 'course_name', 
-            'institution', 'department', 'attachment_start_date'
+            'full_name', 'gender', 'national_id', 'registration_number', 'course_name', 
+            'institution', 'department', 'attachment_start_date', 'attachment_end_date'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -54,6 +55,11 @@ class AttacheeRegistrationForm(forms.ModelForm):
         if User.objects.filter(username=username).exists():
             raise forms.ValidationError("A user with this username already exists.")
 
+        start_date = cleaned_data.get('attachment_start_date')
+        end_date = cleaned_data.get('attachment_end_date')
+        if start_date and not end_date:
+            cleaned_data['attachment_end_date'] = calculate_default_end_date(start_date)
+
         return cleaned_data
 
 
@@ -67,6 +73,8 @@ class AttacheeRegistrationForm(forms.ModelForm):
         )
         profile = super().save(commit=False)
         profile.user = user
+        if profile.attachment_start_date and not profile.attachment_end_date:
+            profile.attachment_end_date = calculate_default_end_date(profile.attachment_start_date)
         profile.save()
         return profile
 

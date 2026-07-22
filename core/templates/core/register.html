@@ -957,14 +957,26 @@
             else if (n === step) el.classList.add('active');
         });
         const pct = ((step - 1) / (totalSteps - 1)) * 100;
-        document.getElementById('progressFill').style.width = Math.max(pct, 5) + '%';
+        const fill = document.getElementById('progressFill');
+        if (fill) fill.style.width = Math.max(pct, 5) + '%';
+    }
+
+    function resetSubmitBtn() {
+        const btn = document.getElementById('submitBtn');
+        const txt = document.getElementById('submitTxt');
+        const spin = document.getElementById('submitSpinner');
+        if (btn) btn.disabled = false;
+        if (txt) txt.textContent = 'Submit Application';
+        if (spin) spin.classList.add('d-none');
     }
 
     function showPanel(step) {
         document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
-        document.getElementById('panel-' + step).classList.add('active');
+        const panel = document.getElementById('panel-' + step);
+        if (panel) panel.classList.add('active');
         updateStepBar(step);
         currentStep = step;
+        resetSubmitBtn();
     }
 
     function goNext(from) {
@@ -990,7 +1002,8 @@
             const email    = v('fs_email');
             const nationalId = v('fs_nat_id');
             const password = v('fs_password');
-            const confirm  = document.getElementById('fs_confirm').value;
+            const confirmEl = document.getElementById('fs_confirm');
+            const confirm  = confirmEl ? confirmEl.value : '';
 
             if (!fullName) { shake('fs_full_name'); ok = false; }
             if (!gender)   { shake('fs_gender');    ok = false; }
@@ -1000,11 +1013,13 @@
             if (password.length < 6) { shake('fs_password'); ok = false; }
 
             if (password !== confirm) {
-                document.getElementById('pwError').style.display = 'block';
+                const err = document.getElementById('pwError');
+                if (err) err.style.display = 'block';
                 shake('fs_confirm');
                 ok = false;
             } else {
-                document.getElementById('pwError').style.display = 'none';
+                const err = document.getElementById('pwError');
+                if (err) err.style.display = 'none';
             }
         }
 
@@ -1039,11 +1054,13 @@
     }
 
     function v(id) {
-        return document.getElementById(id).value.trim();
+        const el = document.getElementById(id);
+        return el ? el.value.trim() : '';
     }
 
     function shake(id) {
         const el = document.getElementById(id);
+        if (!el) return;
         el.style.animation = 'none';
         el.offsetHeight; // reflow
         el.style.animation = 'shake 0.4s ease';
@@ -1070,103 +1087,86 @@
     function buildSummary() {
         const genderMap = { M: 'Male', F: 'Female' };
         const deptSelect = document.getElementById('fs_dept');
-        const deptText = deptSelect.value === 'OTHER'
+        const deptText = (deptSelect && deptSelect.value === 'OTHER')
             ? (v('fs_other_dept') || 'Other')
-            : (deptSelect.options[deptSelect.selectedIndex]?.text || '—');
+            : (deptSelect && deptSelect.options[deptSelect.selectedIndex]?.text || '—');
 
         const fmt = (d) => {
             if (!d) return '—';
             const parts = d.split('-');
+            if (parts.length !== 3) return d;
             const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
             return `${parseInt(parts[2])} ${months[parseInt(parts[1])-1]} ${parts[0]}`;
         };
 
-        document.getElementById('sum_name').textContent       = v('fs_full_name')   || '—';
-        document.getElementById('sum_gender').textContent     = genderMap[v('fs_gender')] || '—';
-        document.getElementById('sum_username').textContent   = v('fs_username')    || '—';
-        document.getElementById('sum_email').textContent      = v('fs_email')       || '—';
-        document.getElementById('sum_natid').textContent      = v('fs_nat_id')      || '—';
-        document.getElementById('sum_regno').textContent      = v('fs_reg_no')      || '—';
-        document.getElementById('sum_course').textContent     = v('fs_course')      || '—';
-        document.getElementById('sum_institution').textContent = v('fs_institution') || '—';
-        document.getElementById('sum_dept').textContent       = deptText;
-        document.getElementById('sum_start').textContent      = fmt(v('fs_start_date'));
-        document.getElementById('sum_end').textContent        = fmt(v('fs_end_date'));
+        if (document.getElementById('sum_name')) document.getElementById('sum_name').textContent       = v('fs_full_name')   || '—';
+        if (document.getElementById('sum_gender')) document.getElementById('sum_gender').textContent     = genderMap[v('fs_gender')] || '—';
+        if (document.getElementById('sum_username')) document.getElementById('sum_username').textContent   = v('fs_username')    || '—';
+        if (document.getElementById('sum_email')) document.getElementById('sum_email').textContent      = v('fs_email')       || '—';
+        if (document.getElementById('sum_natid')) document.getElementById('sum_natid').textContent      = v('fs_nat_id')      || '—';
+        if (document.getElementById('sum_regno')) document.getElementById('sum_regno').textContent      = v('fs_reg_no')      || '—';
+        if (document.getElementById('sum_course')) document.getElementById('sum_course').textContent     = v('fs_course')      || '—';
+        if (document.getElementById('sum_institution')) document.getElementById('sum_institution').textContent = v('fs_institution') || '—';
+        if (document.getElementById('sum_dept')) document.getElementById('sum_dept').textContent       = deptText;
+        if (document.getElementById('sum_start')) document.getElementById('sum_start').textContent      = fmt(v('fs_start_date'));
+        if (document.getElementById('sum_end')) document.getElementById('sum_end').textContent        = fmt(v('fs_end_date'));
     }
 
     // ─── SUBMIT ───
     const registrationForm = document.getElementById('registrationForm');
-    registrationForm.addEventListener('submit', function(e) {
-        // If we are not on the last step, prevent submission and go to next
-        if (currentStep < totalSteps) {
-            e.preventDefault();
-            goNext(currentStep);
-            return false;
-        }
+    if (registrationForm) {
+        registrationForm.addEventListener('submit', function(e) {
+            // If we are not on the last step, prevent submission and go to next
+            if (currentStep < totalSteps) {
+                e.preventDefault();
+                goNext(currentStep);
+                return false;
+            }
 
-        if (!validateStep(currentStep)) {
-            e.preventDefault();
-            return false;
-        }
+            if (!validateStep(currentStep)) {
+                e.preventDefault();
+                resetSubmitBtn();
+                return false;
+            }
 
-        const btn = document.getElementById('submitBtn');
-        const txt = document.getElementById('submitTxt');
-        const spin = document.getElementById('submitSpinner');
-        btn.disabled = true;
-        txt.textContent = 'Submitting...';
-        spin.classList.remove('d-none');
-    });
+            const btn = document.getElementById('submitBtn');
+            const txt = document.getElementById('submitTxt');
+            const spin = document.getElementById('submitSpinner');
+            if (btn && txt && spin) {
+                btn.disabled = true;
+                txt.textContent = 'Submitting...';
+                spin.classList.remove('d-none');
+
+                // Safety timeout to reset button if server takes too long
+                setTimeout(function() {
+                    resetSubmitBtn();
+                }, 15000);
+            }
+        });
+    }
 
     // ─── PASSWORD TOGGLE ───
     function togglePw(fieldId, iconId) {
         const f = document.getElementById(fieldId);
         const i = document.getElementById(iconId);
-        if (f.type === 'password') {
-            f.type = 'text';
-            i.classList.replace('fa-eye', 'fa-eye-slash');
-        } else {
-            f.type = 'password';
-            i.classList.replace('fa-eye-slash', 'fa-eye');
+        if (f && i) {
+            if (f.type === 'password') {
+                f.type = 'text';
+                i.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                f.type = 'password';
+                i.classList.replace('fa-eye-slash', 'fa-eye');
+            }
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        toggleOtherDept();
-    });
-
-    // ─── PASSWORD STRENGTH ───
-    document.getElementById('fs_password').addEventListener('input', function() {
-        const pw = this.value;
-        const fill = document.getElementById('strengthFill');
-        const label = document.getElementById('strengthLabel');
-
-        let score = 0;
-        if (pw.length >= 8) score++;
-        if (/[A-Z]/.test(pw)) score++;
-        if (/[0-9]/.test(pw)) score++;
-        if (/[^A-Za-z0-9]/.test(pw)) score++;
-
-        const configs = [
-            { w: '0%',   bg: '#e5e7eb', txt: 'Enter a password', col: '#6b7280' },
-            { w: '25%',  bg: '#dc2626', txt: 'Weak',    col: '#dc2626' },
-            { w: '50%',  bg: '#f59e0b', txt: 'Fair',    col: '#f59e0b' },
-            { w: '75%',  bg: '#3b82f6', txt: 'Good',    col: '#3b82f6' },
-            { w: '100%', bg: '#22c55e', txt: 'Strong ✓', col: '#16a34a' },
-        ];
-
-        const cfg = configs[pw.length === 0 ? 0 : score];
-        fill.style.width = cfg.w;
-        fill.style.background = cfg.bg;
-        label.textContent = cfg.txt;
-        label.style.color = cfg.col;
-    });
-
     // ─── DEPT OTHER TOGGLE ───
     function toggleOtherDept() {
-        const val = document.getElementById('fs_dept').value;
+        const deptEl = document.getElementById('fs_dept');
         const wrap = document.getElementById('otherDeptWrapper');
         const inp  = document.getElementById('fs_other_dept');
-        if (val === 'OTHER') {
+        if (!deptEl || !wrap || !inp) return;
+        if (deptEl.value === 'OTHER') {
             wrap.classList.remove('d-none');
             inp.setAttribute('required', '');
         } else {
@@ -1175,11 +1175,113 @@
         }
     }
 
-    // ─── CONFIRM PW LIVE CHECK ───
-    document.getElementById('fs_confirm').addEventListener('input', function() {
-        const pw  = document.getElementById('fs_password').value;
-        const err = document.getElementById('pwError');
-        err.style.display = this.value && this.value !== pw ? 'block' : 'none';
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleOtherDept();
+
+        // ─── PASSWORD STRENGTH ───
+        const pwInput = document.getElementById('fs_password');
+        if (pwInput) {
+            pwInput.addEventListener('input', function() {
+                const pw = this.value;
+                const fill = document.getElementById('strengthFill');
+                const label = document.getElementById('strengthLabel');
+                if (!fill || !label) return;
+
+                let score = 0;
+                if (pw.length >= 8) score++;
+                if (/[A-Z]/.test(pw)) score++;
+                if (/[0-9]/.test(pw)) score++;
+                if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+                const configs = [
+                    { w: '0%',   bg: '#e5e7eb', txt: 'Enter a password', col: '#6b7280' },
+                    { w: '25%',  bg: '#dc2626', txt: 'Weak',    col: '#dc2626' },
+                    { w: '50%',  bg: '#f59e0b', txt: 'Fair',    col: '#f59e0b' },
+                    { w: '75%',  bg: '#3b82f6', txt: 'Good',    col: '#3b82f6' },
+                    { w: '100%', bg: '#22c55e', txt: 'Strong ✓', col: '#16a34a' },
+                ];
+
+                const cfg = configs[pw.length === 0 ? 0 : score];
+                fill.style.width = cfg.w;
+                fill.style.background = cfg.bg;
+                label.textContent = cfg.txt;
+                label.style.color = cfg.col;
+            });
+        }
+
+        // ─── CONFIRM PW LIVE CHECK ───
+        const confirmInput = document.getElementById('fs_confirm');
+        if (confirmInput) {
+            confirmInput.addEventListener('input', function() {
+                const pw  = v('fs_password');
+                const err = document.getElementById('pwError');
+                if (err) err.style.display = this.value && this.value !== pw ? 'block' : 'none';
+            });
+        }
+
+        // ─── UNIVERSITY DROPDOWN & START DATE COMPUTATION ───
+        const input = document.getElementById('fs_institution');
+        const dropdown = document.getElementById('university_dropdown_list');
+        const arrow = document.getElementById('dropdown_arrow');
+        const items = document.querySelectorAll('.uni-item');
+
+        const startDateInput = document.getElementById('fs_start_date');
+        const endDateInput = document.getElementById('fs_end_date');
+        if (startDateInput && endDateInput) {
+            startDateInput.addEventListener('change', function() {
+                if (this.value && !endDateInput.value) {
+                    const parts = this.value.split('-');
+                    if (parts.length === 3) {
+                        let y = parseInt(parts[0]);
+                        let m = parseInt(parts[1]) - 1 + 3;
+                        let d = parseInt(parts[2]);
+                        let targetDate = new Date(y, m, d);
+                        let ty = targetDate.getFullYear();
+                        let tm = String(targetDate.getMonth() + 1).padStart(2, '0');
+                        let td = String(targetDate.getDate()).padStart(2, '0');
+                        endDateInput.value = `${ty}-${tm}-${td}`;
+                    }
+                }
+            });
+        }
+
+        if (input && dropdown && arrow) {
+            // Show dropdown on click/focus
+            input.addEventListener('focus', () => {
+                dropdown.style.display = 'block';
+                arrow.style.transform = 'translateY(-50%) rotate(180deg)';
+            });
+
+            // Instant Filter Real-Time Typing Logic
+            input.addEventListener('input', function() {
+                const filter = input.value.toLowerCase();
+                items.forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    if(text.includes(filter)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+
+            // Handle item selection click
+            items.forEach(item => {
+                item.addEventListener('click', function() {
+                    input.value = this.getAttribute('data-value') || this.textContent;
+                    dropdown.style.display = 'none';
+                    arrow.style.transform = 'translateY(-50%) rotate(0deg)';
+                });
+            });
+
+            // Dismiss list when user clicks anywhere outside the container box
+            document.addEventListener('click', function(e) {
+                if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.style.display = 'none';
+                    arrow.style.transform = 'translateY(-50%) rotate(0deg)';
+                }
+            });
+        }
     });
 
     // Auto dismiss flash messages
@@ -1190,64 +1292,6 @@
             setTimeout(() => el.remove(), 500);
         });
     }, 5000);
-    document.addEventListener('DOMContentLoaded', function() {
-        const input = document.getElementById('fs_institution');
-        const dropdown = document.getElementById('university_dropdown_list');
-        const arrow = document.getElementById('dropdown_arrow');
-        const items = document.querySelectorAll('.uni-item');
-
-        // Auto-calculate end date (3 months after start)
-        document.getElementById('fs_start_date').addEventListener('change', function() {
-            if (!this.value) return;
-            const start = new Date(this.value);
-            const end = new Date(start);
-            end.setMonth(start.getMonth() + 3);
-            
-            const yyyy = end.getFullYear();
-            const mm = String(end.getMonth() + 1).padStart(2, '0');
-            const dd = String(end.getDate()).padStart(2, '0');
-            document.getElementById('fs_end_date').value = `${yyyy}-${mm}-${dd}`;
-        });
-
-        // Show dropdown on click/focus
-        input.addEventListener('focus', () => {
-            dropdown.style.display = 'block';
-            arrow.style.transform = 'translateY(-50%) rotate(180deg)';
-        });
-
-        // Instant Filter Real-Time Typing Logic
-        input.addEventListener('input', function() {
-            const filter = input.value.toLowerCase();
-            let matches = 0;
-            
-            items.forEach(item => {
-                const text = item.textContent.toLowerCase();
-                if(text.includes(filter)) {
-                    item.style.display = 'block';
-                    matches++;
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        });
-
-        // Handle item selection click
-        items.forEach(item => {
-            item.addEventListener('click', function() {
-                input.value = this.getAttribute('data-value') || this.textContent;
-                dropdown.style.display = 'none';
-                arrow.style.transform = 'translateY(-50%) rotate(0deg)';
-            });
-        });
-
-        // Dismiss list when user clicks anywhere outside the container box
-        document.addEventListener('click', function(e) {
-            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.style.display = 'none';
-                arrow.style.transform = 'translateY(-50%) rotate(0deg)';
-            }
-        });
-    });
 </script>
     {% include 'core/accessibility_snippet.html' %}
 </body>

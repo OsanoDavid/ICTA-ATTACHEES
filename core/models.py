@@ -46,6 +46,26 @@ class Section(models.Model):
         return f"{self.department.name} - {self.name}"
 
 
+def calculate_default_end_date(start_date):
+    if not start_date:
+        return None
+    if isinstance(start_date, str):
+        try:
+            start_date = datetime.date.fromisoformat(start_date)
+        except ValueError:
+            return None
+    try:
+        month = start_date.month + 3
+        year = start_date.year + (month - 1) // 12
+        month = (month - 1) % 12 + 1
+        import calendar
+        max_day = calendar.monthrange(year, month)[1]
+        day = min(start_date.day, max_day)
+        return datetime.date(year, month, day)
+    except Exception:
+        return start_date + datetime.timedelta(days=90)
+
+
 # 4. Attachée Profiles (Strictly maps 1 attachée to exactly 1 department)
 class AttacheeProfile(models.Model):
     GENDER_CHOICES = (
@@ -79,6 +99,42 @@ class AttacheeProfile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     certificate_approved = models.BooleanField(default=False)
 
+    @property
+    def progress_percent(self):
+        start_date = self.attachment_start_date
+        if not start_date:
+            return 0
+        end_date = self.attachment_end_date or calculate_default_end_date(start_date)
+        if not end_date:
+            return 0
+
+        from django.utils import timezone
+        today = timezone.now().date()
+
+        if isinstance(start_date, str):
+            try:
+                start_date = datetime.date.fromisoformat(start_date)
+            except ValueError:
+                return 0
+
+        if isinstance(end_date, str):
+            try:
+                end_date = datetime.date.fromisoformat(end_date)
+            except ValueError:
+                return 0
+
+        total_days = (end_date - start_date).days
+        if total_days <= 0:
+            return 100 if today >= end_date else 0
+
+        elapsed_days = (today - start_date).days
+        if elapsed_days < 0:
+            return 0
+        elif elapsed_days >= total_days:
+            return 100
+        else:
+            return int((elapsed_days / total_days) * 100)
+
     def update_status(self):
         """
         Automatically transitions status based on current date.
@@ -93,7 +149,7 @@ class AttacheeProfile(models.Model):
         changed = False
 
         start_date = self.attachment_start_date
-        end_date = self.attachment_end_date
+        end_date = self.attachment_end_date or calculate_default_end_date(start_date)
 
         if isinstance(start_date, str):
             try:
@@ -107,9 +163,9 @@ class AttacheeProfile(models.Model):
             except ValueError:
                 end_date = None
         
-        # Rule 1: Auto-complete if end date passed (highest priority)
-        if self.status in ['APPROVED', 'ACTIVE'] and end_date:
-            if today > end_date:
+        # Rule 1: Auto-complete if end date reached/passed or progress reaches 100% (highest priority)
+        if self.status in ['APPROVED', 'ACTIVE']:
+            if (end_date and today >= end_date) or self.progress_percent >= 100:
                 self.status = 'COMPLETED'
                 changed = True
         
@@ -125,8 +181,13 @@ class AttacheeProfile(models.Model):
         if self.national_id is not None:
             if isinstance(self.national_id, str):
                 self.national_id = self.national_id.strip()
-                if self.national_id == '':
+                if self.national_id == '' or self.national_id.lower() == 'none':
                     self.national_id = None
+        
+        # Auto-calculate attachment_end_date if start_date is set but end_date is missing
+        if self.attachment_start_date and not self.attachment_end_date:
+            self.attachment_end_date = calculate_default_end_date(self.attachment_start_date)
+
         # Trigger auto-status update before saving
         self.update_status()
         super().save(*args, **kwargs)

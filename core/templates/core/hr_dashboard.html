@@ -74,6 +74,20 @@
             transform: scale(1.02);
         }
 
+        /* Issue Certificate button — used in placement database table */
+        .btn-purple {
+            background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+            color: white !important;
+            border: none;
+            font-weight: 600;
+        }
+        .btn-purple:hover {
+            background: linear-gradient(135deg, #6d28d9 0%, #4338ca 100%);
+            color: white !important;
+            transform: scale(1.04);
+            box-shadow: 0 4px 14px rgba(109, 40, 217, 0.4);
+        }
+
         .btn-vibrant-pink {
             background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
             color: white;
@@ -423,11 +437,17 @@
                                             </td>
                                             <td class="text-end pe-3">
                                                 <div class="d-inline-flex gap-2">
-                                                    <!-- Edit Button -->
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary" 
-                                                            onclick="openEditModal('{{ profile.id }}', '{{ profile.full_name|escapejs }}', '{{ profile.registration_number|escapejs }}', '{{ profile.national_id|default:''|escapejs }}', '{{ profile.institution|escapejs }}', '{{ profile.course_name|escapejs }}', '{{ profile.department_id }}', '{{ profile.attachment_start_date|date:'Y-m-d' }}', '{{ profile.attachment_end_date|date:'Y-m-d' }}')">
-                                                        <i class="bi bi-pencil-square"></i> Edit
-                                                    </button>
+                                                    <!-- Edit / Closed Button -->
+                                                    {% if profile.status == 'COMPLETED' or profile.progress_percent == 100 %}
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary disabled" disabled title="Attachment completed — Profile is Closed and cannot be edited" style="opacity: 0.65; cursor: not-allowed;">
+                                                            <i class="bi bi-lock-fill me-1"></i> Closed
+                                                        </button>
+                                                    {% else %}
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                                                onclick="openEditModal('{{ profile.id }}', '{{ profile.full_name|escapejs }}', '{{ profile.registration_number|escapejs }}', '{{ profile.national_id|default:''|escapejs }}', '{{ profile.institution|escapejs }}', '{{ profile.course_name|escapejs }}', '{{ profile.department_id }}', '{{ profile.attachment_start_date|date:'Y-m-d' }}', '{{ profile.attachment_end_date|date:'Y-m-d' }}')">
+                                                            <i class="bi bi-pencil-square"></i> Edit
+                                                        </button>
+                                                    {% endif %}
                                                     
                                                     <!-- Certificate Issuance checkbox/link -->
                                                     {% if profile.certificate_approved %}
@@ -436,7 +456,7 @@
                                                         </a>
                                                     {% else %}
                                                         {% if profile.progress_percent == 100 or profile.status == 'COMPLETED' %}
-                                                            <a href="{% url 'hr_issue_certificate' profile.id %}" class="btn btn-sm btn-purple fw-bold" onclick="return confirm('Confirm and issue final completion certificate for {{ profile.full_name|escapejs }}? This will lock their profile state to completed.');">
+                                                            <a href="{% url 'hr_issue_certificate' profile.id %}" class="btn btn-sm btn-purple fw-bold shadow-sm" onclick="return confirm('Confirm and issue final completion certificate for {{ profile.full_name|escapejs }}? This will lock their profile state to completed.');">
                                                                 <i class="bi bi-patch-check-fill me-1"></i> Issue Cert
                                                             </a>
                                                         {% else %}
@@ -848,10 +868,35 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+        .btn-purple {
+            background-color: #8b5cf6 !important;
+            color: #ffffff !important;
+            border: 1px solid #7c3aed !important;
+        }
+        .btn-purple:hover {
+            background-color: #7c3aed !important;
+            color: #ffffff !important;
+        }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        function autoCalcEndDate(startStr) {
+            if (!startStr || startStr === 'None') return '';
+            const parts = startStr.split('-');
+            if (parts.length === 3) {
+                let y = parseInt(parts[0]);
+                let m = parseInt(parts[1]) - 1 + 3;
+                let d = parseInt(parts[2]);
+                let targetDate = new Date(y, m, d);
+                let ty = targetDate.getFullYear();
+                let tm = String(targetDate.getMonth() + 1).padStart(2, '0');
+                let td = String(targetDate.getDate()).padStart(2, '0');
+                return `${ty}-${tm}-${td}`;
+            }
+            return '';
+        }
+
         function openEditModal(profileId, fullName, regNumber, nationalId, institution, courseName, departmentId, startDate, endDate) {
             // Set action url dynamically
             document.getElementById('editAttacheeForm').action = "/hr/edit-attachee/" + profileId + "/";
@@ -863,13 +908,30 @@
             document.getElementById('edit_institution').value = institution;
             document.getElementById('edit_course_name').value = courseName;
             document.getElementById('edit_department').value = departmentId;
-            document.getElementById('edit_start_date').value = startDate;
-            document.getElementById('edit_end_date').value = endDate;
+            document.getElementById('edit_start_date').value = startDate && startDate !== 'None' ? startDate : '';
+
+            const validEndDate = (endDate && endDate !== 'None' && endDate.trim() !== '') 
+                ? endDate 
+                : autoCalcEndDate(startDate);
+
+            document.getElementById('edit_end_date').value = validEndDate;
 
             // Trigger modal show
             var myModal = new bootstrap.Modal(document.getElementById('editAttacheeModal'));
             myModal.show();
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const editStart = document.getElementById('edit_start_date');
+            const editEnd = document.getElementById('edit_end_date');
+            if (editStart && editEnd) {
+                editStart.addEventListener('change', function() {
+                    if (this.value && !editEnd.value) {
+                        editEnd.value = autoCalcEndDate(this.value);
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>

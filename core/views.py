@@ -21,7 +21,8 @@ from .models import (
     GeneratedShift, 
     WeeklyLog,
     RosterConfiguration,
-    RegistrationConfig
+    RegistrationConfig,
+    calculate_default_end_date
 )
 from .forms import WeeklyLogForm, AttacheeRegistrationForm
 from .utils import generate_weekly_shifts
@@ -272,18 +273,14 @@ def change_password_view(request):
 def attachee_dashboard(request):
     profile = getattr(request.user, 'attachee_profile', None)
     if profile:
-        profile.update_status()
+        if profile.attachment_start_date and not profile.attachment_end_date:
+            profile.attachment_end_date = calculate_default_end_date(profile.attachment_start_date)
+            profile.save()
+        else:
+            profile.update_status()
     
     # Calculate Attachment Progress
-    progress_percent = 0
-    if profile and profile.attachment_start_date and profile.attachment_end_date:
-        today = timezone.now().date()
-        total_days = (profile.attachment_end_date - profile.attachment_start_date).days
-        elapsed_days = (today - profile.attachment_start_date).days
-        
-        if elapsed_days < 0: progress_percent = 0
-        elif elapsed_days > total_days: progress_percent = 100
-        else: progress_percent = int((elapsed_days / total_days) * 100) if total_days > 0 else 0
+    progress_percent = profile.progress_percent if profile else 0
 
     # Handle Navigation Offsets
     try:
@@ -1051,19 +1048,16 @@ def hr_dashboard(request):
 
     all_profiles = all_profiles.order_by('-created_at')
 
-    # Compute progress bars and attach to each profile
-    today = timezone.now().date()
-    for profile in all_profiles:
-        profile.progress_percent = 0
-        if profile.attachment_start_date and profile.attachment_end_date:
-            total_days = (profile.attachment_end_date - profile.attachment_start_date).days
-            elapsed_days = (today - profile.attachment_start_date).days
-            if elapsed_days < 0:
-                profile.progress_percent = 0
-            elif elapsed_days > total_days:
-                profile.progress_percent = 100
-            else:
-                profile.progress_percent = int((elapsed_days / total_days) * 100) if total_days > 0 else 0
+    # Ensure attachment_end_date is recorded for profiles that are missing it.
+    # Use queryset update to avoid triggering the model's save() override on each profile.
+    profiles_needing_end_date = [
+        p for p in all_profiles if p.attachment_start_date and not p.attachment_end_date
+    ]
+    for profile in profiles_needing_end_date:
+        calculated_end = calculate_default_end_date(profile.attachment_start_date)
+        if calculated_end:
+            AttacheeProfile.objects.filter(id=profile.id).update(attachment_end_date=calculated_end)
+            profile.attachment_end_date = calculated_end  # update in-memory too
 
     reg_config = RegistrationConfig.get_config()
 
@@ -1285,6 +1279,8 @@ def hr_edit_attachee(request, profile_id):
             except ValueError:
                 messages.error(request, "Invalid end date format. Use YYYY-MM-DD.")
                 return redirect('hr_dashboard')
+        elif profile.attachment_start_date:
+            profile.attachment_end_date = calculate_default_end_date(profile.attachment_start_date)
             
         try:
             profile.save()
@@ -1315,16 +1311,22 @@ def hr_delete_attachee(request, profile_id):
 
 @login_required
 def hr_issue_certificate(request, profile_id):
-    if request.user.role != 'HR' and not request.user.is_superuser:
+    if request.user.role not in ['HR', 'ADMIN'] and not request.user.is_superuser:
         messages.error(request, "Access Denied: HR clearance required.")
         return redirect('login_view')
         
     profile = get_object_or_404(AttacheeProfile, id=profile_id)
-    profile.certificate_approved = True
-    profile.status = 'COMPLETED'
-    profile.save()
-    
-    messages.success(request, f"Certificate has been officially issued for {profile.full_name}. It is now available in their portal.")
+    try:
+        # Use update_fields to bypass the model's save() override (update_status),
+        # ensuring certificate_approved and status are written directly to the DB.
+        AttacheeProfile.objects.filter(id=profile.id).update(
+            certificate_approved=True,
+            status='COMPLETED'
+        )
+        messages.success(request, f"Certificate has been officially issued for {profile.full_name}. It is now available in their portal.")
+    except Exception as e:
+        messages.error(request, f"Failed to issue certificate: {str(e)}")
+        
     return redirect('hr_dashboard')
 
 
@@ -1333,7 +1335,7 @@ def attachee_certificate(request):
     profile = None
     if request.user.role == 'ATTACHEE':
         profile = getattr(request.user, 'attachee_profile', None)
-    elif request.user.role == 'HR' or request.user.is_superuser or request.user.role == 'SUPERVISOR':
+    elif request.user.role in ['HR', 'ADMIN', 'SUPERVISOR'] or request.user.is_superuser:
         profile_id = request.GET.get('profile_id')
         if profile_id:
             profile = get_object_or_404(AttacheeProfile, id=profile_id)
@@ -1364,7 +1366,7 @@ def certificate_pdf(request):
     profile = None
     if request.user.role == 'ATTACHEE':
         profile = getattr(request.user, 'attachee_profile', None)
-    elif request.user.role in ['HR', 'SUPERVISOR'] or request.user.is_superuser:
+    elif request.user.role in ['HR', 'ADMIN', 'SUPERVISOR'] or request.user.is_superuser:
         profile_id = request.GET.get('profile_id')
         if profile_id:
             profile = get_object_or_404(AttacheeProfile, id=profile_id)
@@ -1400,61 +1402,63 @@ def certificate_pdf(request):
 
 @login_required
 def hr_export_certified_excel(request):
-    import openpyxl
-    if request.user.role != 'HR' and not request.user.is_superuser:
+    if request.user.role not in ['HR', 'ADMIN'] and not request.user.is_superuser:
         messages.error(request, "Access Denied: HR clearance required.")
         return redirect('login_view')
 
-    wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.title = "Certified Attachees"
+    try:
+        import openpyxl
+    except ImportError:
+        messages.error(request, "Excel export library (openpyxl) is not installed.")
+        return redirect('hr_dashboard')
 
-    # Define headers
-    headers = [
-        "Full Name", "Gender", "National ID", "Email", 
-        "Start Date", "End Date", "Course", 
-        "University", "Department", "Registration Number"
-    ]
-    ws.append(headers)
+    try:
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Certified Attachees"
 
-    profiles = AttacheeProfile.objects.filter(certificate_approved=True).select_related('department', 'user')
+        headers = [
+            "Full Name", "Gender", "National ID", "Email", 
+            "Start Date", "End Date", "Course", 
+            "University", "Department", "Registration Number", "Status"
+        ]
+        ws.append(headers)
 
-    today = timezone.now().date()
-    for profile in profiles:
-        progress_percent = 0
-        if profile.attachment_start_date and profile.attachment_end_date:
-            total_days = (profile.attachment_end_date - profile.attachment_start_date).days
-            elapsed_days = (today - profile.attachment_start_date).days
-            if elapsed_days < 0:
-                progress_percent = 0
-            elif elapsed_days > total_days:
-                progress_percent = 100
-            else:
-                progress_percent = int((elapsed_days / total_days) * 100) if total_days > 0 else 0
-        else:
-            progress_percent = 0
+        from django.db.models import Q
+        profiles = AttacheeProfile.objects.filter(
+            Q(certificate_approved=True) | Q(status='COMPLETED')
+        ).select_related('department', 'user')
 
-        # Account with 100% progress and issued certificate
-        if progress_percent == 100:
+        for profile in profiles:
+            email_val = profile.user.email if (hasattr(profile, 'user') and profile.user and profile.user.email) else ""
+            dept_val = profile.department.name if (hasattr(profile, 'department') and profile.department) else ""
+            gender_val = profile.get_gender_display() if hasattr(profile, 'get_gender_display') else (profile.gender or "")
+            start_str = profile.attachment_start_date.strftime('%Y-%m-%d') if profile.attachment_start_date else ""
+            end_str = profile.attachment_end_date.strftime('%Y-%m-%d') if profile.attachment_end_date else ""
+
             ws.append([
-                profile.full_name,
-                profile.get_gender_display(),
+                profile.full_name or "",
+                gender_val,
                 profile.national_id or "",
-                profile.user.email,
-                profile.attachment_start_date.strftime('%Y-%m-%d') if profile.attachment_start_date else "",
-                profile.attachment_end_date.strftime('%Y-%m-%d') if profile.attachment_end_date else "",
-                profile.course_name,
-                profile.institution,
-                profile.department.name if profile.department else "",
-                profile.registration_number
+                email_val,
+                start_str,
+                end_str,
+                profile.course_name or "",
+                profile.institution or "",
+                dept_val,
+                profile.registration_number or "",
+                profile.get_status_display()
             ])
 
-    response = HttpResponse(
-        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
-    response['Content-Disposition'] = 'attachment; filename="certified_attachees.xlsx"'
-    wb.save(response)
-    return response
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename="certified_attachees.xlsx"'
+        wb.save(response)
+        return response
+    except Exception as e:
+        messages.error(request, f"Failed to export Excel spreadsheet: {str(e)}")
+        return redirect('hr_dashboard')
 
 
 @login_required
