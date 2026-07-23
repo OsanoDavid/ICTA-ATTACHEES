@@ -519,6 +519,9 @@ def supervisor_dashboard(request):
     ).count()
     total_managed_count = AttacheeProfile.objects.filter(status__in=['APPROVED', 'ACTIVE'], department=dept).count()
 
+    # Departmental work assignments / tasks
+    assigned_tasks = Task.objects.filter(department=dept).order_by('-posted_at')
+
     context = {
         'no_department': False,
         'department_name': dept.name,
@@ -529,8 +532,77 @@ def supervisor_dashboard(request):
         'on_site_today_count': on_site_today_count,
         'total_managed_count': total_managed_count,
         'current_weekday': current_weekday,
+        'assigned_tasks': assigned_tasks,
     }
     return render(request, 'core/supervisor_dashboard.html', context)
+
+
+@login_required
+def assign_work(request):
+    """
+    Allows department supervisors to create and post work assignments / tasks for attachées.
+    """
+    if request.user.role != 'SUPERVISOR':
+        messages.error(request, "Access Denied: Supervisor clearance required.")
+        return redirect('login_view')
+
+    dept = request.user.department
+    if not dept:
+        messages.error(request, "You have not been assigned to a department yet.")
+        return redirect('supervisor_dashboard')
+
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        description = request.POST.get('description', '').strip()
+        target_work_mode = request.POST.get('target_work_mode', 'ALL')
+        deadline_str = request.POST.get('deadline')
+
+        if not title or not description or not deadline_str:
+            messages.error(request, "Please fill in all required fields to assign work.")
+            return redirect('supervisor_dashboard')
+
+        try:
+            deadline = datetime.datetime.fromisoformat(deadline_str)
+            if timezone.is_naive(deadline):
+                deadline = timezone.make_aware(deadline, timezone.get_current_timezone())
+        except ValueError:
+            messages.error(request, "Invalid deadline date format.")
+            return redirect('supervisor_dashboard')
+
+        Task.objects.create(
+            department=dept,
+            supervisor=request.user,
+            title=title,
+            description=description,
+            target_work_mode=target_work_mode,
+            deadline=deadline
+        )
+        messages.success(request, f"Work assignment '{title}' assigned successfully.")
+
+    return redirect('supervisor_dashboard')
+
+
+@login_required
+def delete_task(request, task_id):
+    """
+    Allows supervisors to delete an assigned work task for their department.
+    """
+    if request.user.role != 'SUPERVISOR':
+        messages.error(request, "Access Denied: Supervisor clearance required.")
+        return redirect('login_view')
+
+    dept = request.user.department
+    if not dept:
+        messages.error(request, "You have not been assigned to a department yet.")
+        return redirect('supervisor_dashboard')
+
+    task = get_object_or_404(Task, id=task_id, department=dept)
+    task_title = task.title
+    task.delete()
+
+    messages.warning(request, f"Work assignment '{task_title}' deleted.")
+    return redirect('supervisor_dashboard')
+
 
 
 @login_required

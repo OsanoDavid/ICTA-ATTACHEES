@@ -19,6 +19,8 @@ urlpatterns = [
 
     # Supervisor Dashboard & Actions
     path('supervisor/', views.supervisor_dashboard, name='supervisor_dashboard'),
+    path('supervisor/assign-work/', views.assign_work, name='assign_work'),
+    path('supervisor/delete-task/<int:task_id>/', views.delete_task, name='delete_task'),
     path('approve/<int:profile_id>/', views.approve_attachee, name='approve_attachee'),
     path('reject/<int:profile_id>/', views.reject_attachee, name='reject_attachee'),
     path('review-logbook/<int:log_id>/', views.review_logbook, name='review_logbook'),
