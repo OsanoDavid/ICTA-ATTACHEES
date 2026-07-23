@@ -14,15 +14,15 @@
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
-            padding: 30px 20px 60px;
+            padding: 20px 10px;
             font-family: 'Outfit', sans-serif;
         }
 
         /* ── Print Controls ── */
         .print-controls {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 15px;
+            right: 15px;
             display: flex;
             gap: 10px;
             z-index: 1000;
@@ -32,16 +32,16 @@
             background: #1e293b;
             color: #fff;
             border: none;
-            padding: 10px 22px;
+            padding: 8px 18px;
             border-radius: 8px;
             font-family: 'Outfit', sans-serif;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             transition: background 0.2s;
         }
@@ -51,17 +51,20 @@
 
         /* ── Certificate Wrapper ── */
         .cert-page {
-            width: 960px;
+            width: 900px;
             background: #fffef5;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 15px 45px rgba(0,0,0,0.25);
             position: relative;
             overflow: hidden;
+            box-sizing: border-box;
+            page-break-inside: avoid;
+            break-inside: avoid;
         }
 
-        /* ── TOP BORDER ── Red/White mosaic pattern */
+        /* ── TOP & BOTTOM BORDERS ── Red/White mosaic pattern */
         .border-top-strip, .border-bottom-strip {
             width: 100%;
-            height: 55px;
+            height: 40px;
             background: #cc0000;
             position: relative;
             overflow: hidden;
@@ -86,7 +89,6 @@
                 );
         }
 
-        /* Meander / Greek Key SVG-like strips */
         .border-top-strip::before,
         .border-bottom-strip::before {
             content: '';
@@ -106,9 +108,9 @@
         /* ── SIDE BARS: Kenya Flag Colors ── */
         .sidebar-left, .sidebar-right {
             position: absolute;
-            top: 55px;
-            bottom: 55px;
-            width: 22px;
+            top: 40px;
+            bottom: 40px;
+            width: 18px;
             display: flex;
             flex-direction: column;
         }
@@ -119,40 +121,29 @@
         .bar-black { flex: 1; background: #1a1a1a; }
         .bar-green { flex: 1; background: #006600; }
 
-        /* ── CIRCUIT BOARD BACKGROUND WATERMARK ── */
+        /* ── WATERMARKS ── */
         .circuit-watermark {
             position: absolute;
-            top: 55px;
-            left: 22px;
-            right: 22px;
-            bottom: 55px;
-            opacity: 0.06;
+            top: 40px;
+            left: 18px;
+            right: 18px;
+            bottom: 40px;
+            opacity: 0.05;
             pointer-events: none;
             background-image:
                 linear-gradient(#cc0000 1px, transparent 1px),
                 linear-gradient(90deg, #cc0000 1px, transparent 1px),
                 radial-gradient(circle at 30% 40%, #cc0000 2px, transparent 2px),
-                radial-gradient(circle at 70% 60%, #cc0000 2px, transparent 2px),
-                radial-gradient(circle at 50% 25%, #cc0000 2px, transparent 2px),
-                radial-gradient(circle at 20% 70%, #cc0000 2px, transparent 2px),
-                radial-gradient(circle at 80% 30%, #cc0000 2px, transparent 2px);
-            background-size:
-                50px 50px,
-                50px 50px,
-                150px 150px,
-                200px 200px,
-                250px 250px,
-                180px 180px,
-                120px 120px;
+                radial-gradient(circle at 70% 60%, #cc0000 2px, transparent 2px);
+            background-size: 50px 50px, 50px 50px, 150px 150px, 200px 200px;
         }
 
-        /* Center ICT Authority watermark logo text */
         .center-watermark {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 5rem;
+            font-size: 4.5rem;
             font-weight: 800;
             color: #cc0000;
             opacity: 0.04;
@@ -163,7 +154,7 @@
 
         /* ── MAIN CONTENT AREA ── */
         .cert-body {
-            padding: 40px 70px 45px;
+            padding: 22px 50px 22px;
             position: relative;
             z-index: 2;
             text-align: center;
@@ -174,27 +165,27 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 55px;
-            margin-bottom: 20px;
+            gap: 40px;
+            margin-bottom: 8px;
         }
 
         .logo-ministry {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .logo-ministry img {
-            height: 58px;
+            height: 46px;
         }
 
         .ministry-text {
-            font-size: 0.68rem;
-            line-height: 1.4;
+            font-size: 0.62rem;
+            line-height: 1.3;
             font-weight: 600;
             color: #1e293b;
             text-align: left;
-            max-width: 130px;
+            max-width: 120px;
         }
 
         .logo-icta {
@@ -204,12 +195,12 @@
         }
 
         .icta-icon {
-            width: 45px;
-            height: 45px;
+            width: 38px;
+            height: 38px;
         }
 
         .icta-text {
-            font-size: 2.1rem;
+            font-size: 1.8rem;
             font-weight: 800;
             color: #cc0000;
             font-style: italic;
@@ -217,7 +208,7 @@
         }
 
         .icta-sub {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             color: #374151;
             font-weight: 600;
             margin-top: -2px;
@@ -226,33 +217,33 @@
         /* ── CERTIFICATE TITLE ── */
         .cert-title {
             font-family: 'MedievalSharp', 'Playfair Display', serif;
-            font-size: 3rem;
+            font-size: 2.3rem;
             color: #cc0000;
-            margin: 5px 0 20px;
+            margin: 2px 0 8px;
             letter-spacing: 1px;
         }
 
         /* ── AWARDED TO SECTION ── */
         .awarded-to-label {
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             color: #374151;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
             font-style: italic;
         }
 
         .recipient-name {
             font-family: 'Great Vibes', cursive;
-            font-size: 3.6rem;
+            font-size: 3.1rem;
             color: #15803d;
-            line-height: 1.15;
-            margin: 2px 0 6px;
+            line-height: 1.1;
+            margin: 0 0 2px;
         }
 
         .name-underlines {
             display: flex;
             justify-content: center;
             gap: 6px;
-            margin-bottom: 22px;
+            margin-bottom: 12px;
         }
 
         .name-underlines span {
@@ -260,38 +251,38 @@
             background: #9ca3af;
         }
 
-        .name-line-long { width: 220px; }
-        .name-line-mid { width: 80px; }
+        .name-line-long { width: 200px; }
+        .name-line-mid { width: 70px; }
 
         /* ── BODY TEXT ── */
         .body-text {
-            font-size: 1.05rem;
+            font-size: 0.95rem;
             color: #374151;
-            line-height: 1.8;
-            margin-bottom: 5px;
+            line-height: 1.4;
+            margin-bottom: 4px;
         }
 
         .program-title-box {
             display: inline-block;
-            margin: 8px 0 8px;
-            padding: 0 40px;
+            margin: 4px 0 6px;
+            padding: 0 20px;
         }
 
         .program-title {
-            font-size: 1.15rem;
+            font-size: 1.05rem;
             font-weight: 700;
             color: #1e293b;
             text-align: center;
             border-top: 1px solid #94a3b8;
             border-bottom: 1px solid #94a3b8;
-            padding: 6px 30px;
+            padding: 4px 24px;
             letter-spacing: 0.5px;
         }
 
         .conducted-line {
-            font-size: 1.0rem;
+            font-size: 0.9rem;
             color: #374151;
-            margin: 10px 0 18px;
+            margin: 6px 0 10px;
         }
 
         .highlight-bold {
@@ -301,29 +292,29 @@
 
         /* ── DATE SECTION ── */
         .on-this-date-label {
-            font-size: 1rem;
+            font-size: 0.85rem;
             color: #374151;
             font-style: italic;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .date-value {
-            font-size: 1.25rem;
+            font-size: 1.05rem;
             font-weight: 700;
             color: #1e293b;
             border-top: 1px solid #cbd5e1;
             border-bottom: 1px solid #cbd5e1;
-            padding: 5px 0;
+            padding: 3px 0;
             display: inline-block;
-            min-width: 200px;
-            margin-bottom: 16px;
+            min-width: 170px;
+            margin-bottom: 8px;
         }
 
         .cert-id {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             font-weight: 700;
             color: #374151;
-            margin-bottom: 24px;
+            margin-bottom: 10px;
         }
 
         /* ── FOOTER: SIGNATURE + QR ── */
@@ -331,61 +322,54 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            margin-top: 12px;
+            margin-top: 6px;
         }
 
         .signature-block {
             text-align: center;
         }
 
-        .signature-img {
-            height: 55px;
-            margin-bottom: 2px;
-            filter: brightness(0);
-        }
-
         .signature-line {
-            width: 200px;
+            width: 170px;
             height: 1px;
             background: #64748b;
-            margin: 4px auto 8px;
+            margin: 2px auto 6px;
         }
 
         .sig-role {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #374151;
-            margin-bottom: 2px;
+            margin-bottom: 1px;
         }
 
         .sig-name {
-            font-size: 0.9rem;
+            font-size: 0.82rem;
             font-weight: 700;
             color: #1e293b;
         }
 
         .sig-org {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #374151;
             font-style: italic;
         }
 
-        /* QR block */
         .qr-block {
             text-align: center;
         }
 
         .qr-code-img {
-            width: 90px;
-            height: 90px;
+            width: 70px;
+            height: 70px;
             border: 2px solid #e2e8f0;
-            padding: 5px;
+            padding: 4px;
             background: white;
             display: block;
-            margin: 0 auto 6px;
+            margin: 0 auto 4px;
         }
 
         .qr-label {
-            font-size: 0.72rem;
+            font-size: 0.68rem;
             color: #64748b;
         }
 
@@ -396,10 +380,12 @@
         }
 
         @media print {
-            body {
-                background: white !important;
-                padding: 0 !important;
+            html, body {
+                width: 297mm !important;
+                height: 210mm !important;
                 margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
@@ -408,23 +394,37 @@
                 box-shadow: none !important;
                 width: 297mm !important;
                 height: 210mm !important;
+                max-height: 210mm !important;
                 margin: 0 auto !important;
                 position: relative !important;
+                page-break-inside: avoid !important;
                 page-break-after: avoid !important;
                 break-after: avoid !important;
+                overflow: hidden !important;
             }
         }
 
         /* ── PDF MODE / XHTML FALLBACKS FOR XHTML2PDF ── */
         {% if pdf_mode %}
-        body {
-            background: white !important;
-            padding: 0 !important;
+        @page {
+            size: a4 landscape;
+            margin: 0mm;
+        }
+        html, body {
+            width: 297mm !important;
+            height: 210mm !important;
             margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
         }
         .cert-page {
-            width: 100% !important;
+            width: 297mm !important;
+            height: 210mm !important;
+            max-height: 210mm !important;
             box-shadow: none !important;
+            page-break-inside: avoid !important;
+            page-break-after: avoid !important;
+            overflow: hidden !important;
         }
         .logos-row {
             display: table !important;
@@ -453,8 +453,8 @@
         }
         .qr-code-img {
             display: inline-block !important;
-            width: 90px !important;
-            height: 90px !important;
+            width: 70px !important;
+            height: 70px !important;
         }
         {% endif %}
     </style>
@@ -516,7 +516,7 @@
             </div>
 
             <!-- Divider -->
-            <div style="width: 1px; height: 50px; background: #cbd5e1; display: inline-block;"></div>
+            <div style="width: 1px; height: 40px; background: #cbd5e1; display: inline-block;"></div>
 
             <!-- ICT Authority -->
             <div class="logo-icta">
@@ -578,7 +578,7 @@
             <!-- Signature Block -->
             <div class="signature-block">
                 <!-- SVG placeholder signature curve -->
-                <svg width="160" height="55" viewBox="0 0 160 55" xmlns="http://www.w3.org/2000/svg">
+                <svg width="150" height="45" viewBox="0 0 160 55" xmlns="http://www.w3.org/2000/svg">
                     <path d="M 20 42 C 35 20, 55 15, 70 30 C 85 45, 90 20, 110 25 C 125 28, 135 35, 145 38"
                           fill="none" stroke="#1e293b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M 140 38 L 147 32 M 140 38 L 143 45"
@@ -593,11 +593,11 @@
             <!-- QR Code Block -->
             <div class="qr-block">
                 <img
-                    src="https://api.qrserver.com/v1/create-qr-code/?data=ICTA-CERT-{{ profile.registration_number }}-{{ today|date:'Y' }}&size=90x90&color=1e293b"
+                    src="https://api.qrserver.com/v1/create-qr-code/?data=ICTA-CERT-{{ profile.registration_number }}-{{ today|date:'Y' }}&size=70x70&color=1e293b"
                     alt="Verification QR Code"
                     class="qr-code-img"
                     crossorigin="anonymous"
-                    onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?data=ICTA-CERT&size=90x90'"
+                    onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?data=ICTA-CERT&size=70x70'"
                 >
                 <div class="qr-label">Scan to verify</div>
             </div>
@@ -621,18 +621,18 @@ function downloadCertificatePDF() {
 
     const element = document.querySelector('.cert-page');
     
-    // Ensure all images are loaded before generating PDF
     const opt = {
         margin:       0,
         filename:     'ICTA_Certificate_{{ profile.registration_number|slugify }}.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { 
-            scale: 2.5, 
+            scale: 2, 
             useCORS: true, 
             allowTaint: true,
             logging: false
         },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' },
+        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
     };
 
     if (window.html2pdf) {
@@ -643,11 +643,9 @@ function downloadCertificatePDF() {
             console.error('html2pdf error:', err);
             btn.innerHTML = originalText;
             btn.disabled = false;
-            // Fallback to server endpoint if html2pdf fails
             window.location.href = "{% url 'certificate_pdf' %}{% if request.GET.profile_id %}?profile_id={{ request.GET.profile_id }}{% endif %}";
         });
     } else {
-        // Fallback to server endpoint
         window.location.href = "{% url 'certificate_pdf' %}{% if request.GET.profile_id %}?profile_id={{ request.GET.profile_id }}{% endif %}";
     }
 }
